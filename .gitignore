@@ -1,0 +1,12 @@
+# Composer
+/vendor/
+
+#Netbeans
+/nbproject/
+
+#Archivos
+src/Archivos/
+
+#VSC
+.vscode/
+
