@@ -31,7 +31,8 @@ $config = [
         'leroy_fr' => ['token'=>$_ENV['LEROY_FR_TOKEN'], 'idShop' => $_ENV['LEROY_FR_SHOP']],
         'leroy_es' => ['token'=>$_ENV['LEROY_ES_TOKEN'], 'idShop' => $_ENV['LEROY_ES_SHOP']],
         'leroy_it' => ['token'=>$_ENV['LEROY_IT_TOKEN'], 'idShop' => $_ENV['LEROY_IT_SHOP']],
-        'leroy_pt' => ['token'=>$_ENV['LEROY_PT_TOKEN'], 'idShop' => $_ENV['LEROY_PT_SHOP']]
+        'leroy_pt' => ['token'=>$_ENV['LEROY_PT_TOKEN'], 'idShop' => $_ENV['LEROY_PT_SHOP']],
+        'carrefour' => ['token'=>$_ENV['CARREFOUR_TOKEN'], 'idShop' => $_ENV['CARREFOUR_SHOP']]
 
     ],
     'makroConfig' => [
