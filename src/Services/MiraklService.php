@@ -14,7 +14,8 @@ class MiraklService
     private $miraklIdShop;
 
     private $paths = [
-        'leroy' => 'https://leroymerlin-marketplace.mirakl.net/api/'
+        'leroy' => 'https://leroymerlin-marketplace.mirakl.net/api/',
+        'carrefour' => 'https://carrefoures-prod.mirakl.net/api/'
     ];
 
     private $countryLeroy = [
