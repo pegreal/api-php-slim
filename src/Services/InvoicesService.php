@@ -61,6 +61,13 @@ class InvoicesService
                         $this->updateInvoiceState($idOrderMarket, $market, 2);
                     }
                     return $sendInvoice;
+                    //Carrefour
+                    case '7' :
+                        $sendInvoice = $this->miraklService->sendInvoice('carrefour',$idOrderMarket, $country, $invoice);
+                        if($sendInvoice['status'] == 'success'){
+                            $this->updateInvoiceState($idOrderMarket, $market, 2);
+                        }
+                        return $sendInvoice;
                     //Makro
                     case '28' :
                         $sendInvoice = $this->makroService->sendInvoice($idOrderMarket, $country, $invoice);
