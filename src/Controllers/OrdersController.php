@@ -43,6 +43,37 @@ class OrdersController
         
         
     }
+
+    public function sincroOrders(Request $request, Response $response, $args)
+    {
+
+        $decodedTokenData = $request->getAttribute('decoded_token_data');
+        $decodedTokenData = json_decode(json_encode($decodedTokenData), true);
+         if ($decodedTokenData && isset($decodedTokenData['data']['user_id'])) {
+             
+            $userId = $decodedTokenData['data']['user_id'];
+            $userPermises = $decodedTokenData['data']['user_permision'];
+
+            $queryParams = $request->getQueryParams();
+            $market = $queryParams['market'];
+            $state = $queryParams['state'];
+            $limit = $queryParams['limit'];
+            $offset = $queryParams['offset'];
+
+            $ordersData = $this->ordersService->sincroOrders($market, $state, $limit, $offset);
+                                              
+            $response->getBody()->write(json_encode(array('user_id' => $userId, 'permision'=> $userPermises, 'orders' => $ordersData)));
+            return $response->withHeader('Content-Type', 'application/json');
+             
+         }else {
+            $response->getBody()->write("Token inválido o falta información");
+            return $response->withStatus(401)->withHeader('Content-Type', 'text/plain');
+        }
+        
+        
+        
+        
+    }
     
     
     

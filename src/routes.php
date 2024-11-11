@@ -22,6 +22,7 @@ return function (App $app) {
     $app->group('/orders', function ($group) {
         //toDo
         $group->get('/', OrdersController::class . ':getOrders');
+        $group->get('/sincro', OrdersController::class . ':sincroOrders');
     });
 
     $app->group('/invoices', function ($group) {

@@ -51,10 +51,7 @@ return function (Container $container) {
         return new OrdersController($container->get(OrdersService::class));
     });
 
-    // Configurar ordersService
-    $container->set(OrdersService::class, function ($container) {
-        return new OrdersService($container->get(DatabaseService::class));
-    });
+   
 
      // Configurar InvoicesController
      $container->set(InvoicesController::class, function ($container) {
@@ -159,6 +156,15 @@ return function (Container $container) {
             $container->get(MakroService::class),
             $container->get(KauflandService::class),
             $container->get(ManomanoService::class),
+        );
+    });
+
+     // Configurar ordersService
+     $container->set(OrdersService::class, function ($container) {
+        return new OrdersService(
+            $container->get(DatabaseService::class),
+            $container->get(MiraklService::class),
+            $container->get(MakroService::class),
         );
     });
 
