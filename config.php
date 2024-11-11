@@ -43,6 +43,10 @@ $config = [
         'client_key' => $_ENV['KAUFLAND_KEY'],
         'client_secret' => $_ENV['KAUFLAND_SECRET']
     ],
+    'miraviaConfig' => [
+        'client_key' => $_ENV['MIRAVIA_KEY'],
+        'client_secret' => $_ENV['MIRAVIA_SECRET']
+    ],
     'mailConfig' => [
         'host' => $_ENV['MAIL_HOST'],
         'port' => $_ENV['MAIL_PORT'],

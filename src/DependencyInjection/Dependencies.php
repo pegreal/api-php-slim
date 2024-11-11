@@ -17,6 +17,7 @@ use Services\MiraklService;
 use Services\MakroService;
 use Services\KauflandService;
 use Services\ManomanoService;
+use Services\MiraviaService;
 
 
 return function (Container $container) {
@@ -112,7 +113,7 @@ return function (Container $container) {
         return $kauflandConfig;
     }); 
 
-    // Configurar MakroService
+    // Configurar KauflandService
     $container->set(KauflandService::class, function ($container) {
         
         return new KauflandService(
@@ -145,6 +146,22 @@ return function (Container $container) {
         );
     });
 
+    // Configurar el array de configuración adicional
+    $container->set('miraviaConfig', function () {
+        require __DIR__ . '/../../config.php';
+        $miraviaConfig = $config['miraviaConfig']; 
+        return $miraviaConfig;
+    }); 
+
+     // Configurar MiraviaService
+     $container->set(MiraviaService::class, function ($container) {
+        
+        return new MiraviaService(
+            $container->get(DatabaseService::class),
+            $container->get('miraviaConfig')
+        );
+    });
+
 
 
     // Configurar InvoicesService
@@ -165,6 +182,7 @@ return function (Container $container) {
             $container->get(DatabaseService::class),
             $container->get(MiraklService::class),
             $container->get(MakroService::class),
+            $container->get(MiraviaService::class),
         );
     });
 

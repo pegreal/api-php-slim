@@ -272,6 +272,7 @@ class MiraklService
       
                 foreach($orderLines as $orderLine)
                 {
+                    $orderData['idLine'] = ''; //Pending, not in use
                     $orderData['title'] = $orderLine->product_title;
                     $orderData['sku'] = $orderLine->offer_sku;
                     $orderData['ean'] = $orderLine->offer_sku;

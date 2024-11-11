@@ -56,11 +56,12 @@ class OrdersController
 
             $queryParams = $request->getQueryParams();
             $market = $queryParams['market'];
+            $country = $queryParams['country'];
             $state = $queryParams['state'];
             $limit = $queryParams['limit'];
             $offset = $queryParams['offset'];
 
-            $ordersData = $this->ordersService->sincroOrders($market, $state, $limit, $offset);
+            $ordersData = $this->ordersService->sincroOrders($market, $country, $state, $limit, $offset);
                                               
             $response->getBody()->write(json_encode(array('user_id' => $userId, 'permision'=> $userPermises, 'orders' => $ordersData)));
             return $response->withHeader('Content-Type', 'application/json');

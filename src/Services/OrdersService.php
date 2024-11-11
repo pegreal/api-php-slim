@@ -8,13 +8,15 @@ class OrdersService
     private $dbService;
     private $miraklService;
     private $makroService;
+    private $miraviaService;
     private $shops;
 
-    public function __construct(DatabaseService $dbService, MiraklService $miraklService, MakroService $makroService)
+    public function __construct(DatabaseService $dbService, MiraklService $miraklService, MakroService $makroService, MiraviaService $miraviaService)
     {
         $this->dbService = $dbService;
         $this->miraklService = $miraklService;
         $this->makroService = $makroService;
+        $this->miraviaService = $miraviaService;
         $this->shops = $this->getShopsId();
 
     }
@@ -51,31 +53,51 @@ class OrdersService
         else return false;
     }
     
-    public function sincroOrders($market, $state, $limit, $offset){
+    public function sincroOrders($market, $country, $state, $limit, $offset){
 
         if($market && $state){
             switch($market){
                
                 //Leroy merlin
                 case '21' :
-                $ordersRequest = $this->miraklService->getOrders('leroy','ES',$state, $limit, $offset);
-                if($ordersRequest['status'] === 'success'){
-                    $orders = $ordersRequest['details']['response']->orders;
-                    $ordersProcessed = $this->miraklService->processOrders('leroy','21','ES', $orders);
-                    if($ordersProcessed['status'] === 'success'){
-                        $shop = $this->shops['ES'];
-                        $ordersCreated = $this->createOrders($shop,'21',$ordersProcessed['details']['response']);
-                        return array("status"=> "succes","details"=> $ordersCreated);
+                    $ordersRequest = $this->miraklService->getOrders('leroy',$country, $state, $limit, $offset);
+                    if($ordersRequest['status'] === 'success'){
+                        $orders = $ordersRequest['details']['response']->orders;
+                        $ordersProcessed = $this->miraklService->processOrders('leroy','21',$country, $orders);
+                        if($ordersProcessed['status'] === 'success'){
+                            $shop = $this->shops[$country];
+                            $ordersCreated = $this->createOrders($shop,'21',$ordersProcessed['details']['response']);
+                            return array("status"=> "succes","details"=> $ordersCreated);
+                        }
+                        else{
+                            return array("status"=> "error","details"=> $ordersProcessed['error']);
+                        }
+
                     }
                     else{
-                        return array("status"=> "error","details"=> $ordersProcessed['error']);
+                        return array("status"=> "error","details"=> $ordersRequest['error']);
                     }
-
-                }
-                else{
-                    return array("status"=> "error","details"=> $ordersRequest['error']);
-                }
-                                  
+                  
+                case '30':
+                    $ordersRequest = $this->miraviaService->getOrders( $state, $limit, $offset);
+                    if($ordersRequest['status'] === 'success'){
+                        $orders = $ordersRequest['details']['response']->data->orders;
+                        
+                        $ordersProcessed = $this->miraviaService->processOrders('30',$country, $orders);
+                        
+                        if($ordersProcessed['status'] === 'success'){
+                            $shop = $this->shops[$country];
+                            $ordersCreated = $this->createOrders($shop,'30',$ordersProcessed['details']['response']);
+                            return array("status"=> "succes","details"=> $ordersCreated);
+                        }
+                        else{
+                            return array("status"=> "error","details"=> $ordersProcessed['error']);
+                        }
+                        
+                    }
+                    else{
+                        return array("status"=> "error","details"=> $ordersRequest['error']);
+                    }    
                     
                 default :
                     return 'No market defined';
@@ -167,6 +189,7 @@ class OrdersService
         $sector = $orderData['sector'];
         
         $FechaSucces = $orderData['success'];
+        $idMarketLine = $orderData['idLine'];
         $NameProduct = $orderData['title'];
         $ID_Product = $orderData['sku'];
         $EAN_product = $orderData['ean'];
@@ -198,6 +221,7 @@ class OrdersService
             intUnidades,
             strPais,
             fchFechaPago,
+            strInfoCarrier5,
             strMetodoPago, strAgent, intOrderState, intTypeCustomer, strCompanyName, intProfessionalSector) 
         VALUES ('$idMarket',
                     '$shop','$orderId', '$firtsNameEnvio', '$LastNameEnvio', '$email', '$CIF',
@@ -209,6 +233,7 @@ class OrdersService
                     '$Product_Qty', 
                     '$countryCode',
                     '$FechaSucces',
+                    '$idMarketLine',
                     '$agent', '$agent', '2', '$tipoCliente', '$company', '$sector' )";
     
     
