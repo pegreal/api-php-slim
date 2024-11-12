@@ -267,6 +267,7 @@ class MiraklService
                                
                 $orderData['isPro'] = null;
                 $orderData['sector'] = null;
+                $orderData['tipoCliente'] = 1;
                 
                 $orderData['success'] = $order->last_updated_date;;
       
@@ -291,7 +292,7 @@ class MiraklService
 
         }
         else{
-            return;
+            return array("status"=> "success","details"=> "No orders found");
         }
 
     }

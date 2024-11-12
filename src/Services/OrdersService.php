@@ -70,12 +70,12 @@ class OrdersService
                             return array("status"=> "succes","details"=> $ordersCreated);
                         }
                         else{
-                            return array("status"=> "error","details"=> $ordersProcessed['error']);
+                            return array("status"=> "error","details"=> $ordersProcessed['details']);
                         }
 
                     }
                     else{
-                        return array("status"=> "error","details"=> $ordersRequest['error']);
+                        return array("status"=> "error","details"=> $ordersRequest['details']);
                     }
                   
                 case '30':
@@ -91,13 +91,34 @@ class OrdersService
                             return array("status"=> "succes","details"=> $ordersCreated);
                         }
                         else{
-                            return array("status"=> "error","details"=> $ordersProcessed['error']);
+                            return array("status"=> "error","details"=> $ordersProcessed['details']);
                         }
                         
                     }
                     else{
-                        return array("status"=> "error","details"=> $ordersRequest['error']);
-                    }    
+                        return array("status"=> "error","details"=> $ordersRequest['details']);
+                    }
+                    case '28':
+                        $ordersRequest = $this->makroService->getOrders(false, $state, $limit, $offset);
+                        if($ordersRequest['status'] === 'success'){
+                            
+                            $orders = $ordersRequest['details']->items;
+                            
+                            $ordersProcessed = $this->makroService->processOrders('28',$country, $orders);
+                            
+                            if($ordersProcessed['status'] === 'success'){
+                                $shop = $this->shops[$country];
+                                $ordersCreated = $this->createOrders($shop,'28',$ordersProcessed['details']['response']);
+                                return array("status"=> "success","details"=> $ordersCreated);
+                            }
+                            else{
+                                return array("status"=> "error","details"=> $ordersProcessed['details']);
+                            }
+                            
+                        }
+                        else{
+                            return array("status"=> "error","details"=> $ordersRequest['details']);
+                        }    
                     
                 default :
                     return 'No market defined';
@@ -156,8 +177,8 @@ class OrdersService
         $agent = $this->getAgent($idMarket); //forma de pago
         $orderId = $orderData['orderId'];
     
-        $tipoCliente = 1;
-        $sector = null;
+        $tipoCliente = $orderData['tipoCliente'];
+        $sector = $orderData['sector'];
         
         $Total_order = $orderData['total'];
         $Total_logistics = $orderData['logistics'];

@@ -271,6 +271,7 @@ class MiraviaService
                                
                 $orderData['isPro'] = null;
                 $orderData['sector'] = null;
+                $orderData['tipoCliente'] = 1;
                 
                 $orderData['success'] = $order->created_at;
       
@@ -302,7 +303,8 @@ class MiraviaService
 
         }
         else{
-            return;
+            return array("status"=> "error","details"=> 'No orders found');
+
         }
 
     }
