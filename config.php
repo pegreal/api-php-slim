@@ -47,6 +47,9 @@ $config = [
         'client_key' => $_ENV['MIRAVIA_KEY'],
         'client_secret' => $_ENV['MIRAVIA_SECRET']
     ],
+    'kuantoConfig' => [
+        'client_token' => $_ENV['KUANTO_TOKEN']
+    ],
     'mailConfig' => [
         'host' => $_ENV['MAIL_HOST'],
         'port' => $_ENV['MAIL_PORT'],

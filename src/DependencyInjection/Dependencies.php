@@ -18,6 +18,7 @@ use Services\MakroService;
 use Services\KauflandService;
 use Services\ManomanoService;
 use Services\MiraviaService;
+use Services\KuantoService;
 
 
 return function (Container $container) {
@@ -162,6 +163,22 @@ return function (Container $container) {
         );
     });
 
+     // Kuantokusta Configurar el array de configuración adicional
+     $container->set('kuantoConfig', function () {
+        require __DIR__ . '/../../config.php';
+        $kuantoConfig = $config['kuantoConfig']; 
+        return $kuantoConfig;
+    }); 
+
+    // Configurar KauflandService
+    $container->set(KuantoService::class, function ($container) {
+        
+        return new KuantoService(
+            $container->get(DatabaseService::class),
+            $container->get('kuantoConfig')
+        );
+    });
+
 
 
     // Configurar InvoicesService
@@ -183,6 +200,7 @@ return function (Container $container) {
             $container->get(MiraklService::class),
             $container->get(MakroService::class),
             $container->get(MiraviaService::class),
+            $container->get(KuantoService::class),
         );
     });
 

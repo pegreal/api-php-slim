@@ -9,14 +9,16 @@ class OrdersService
     private $miraklService;
     private $makroService;
     private $miraviaService;
+    private $kuantoService;
     private $shops;
 
-    public function __construct(DatabaseService $dbService, MiraklService $miraklService, MakroService $makroService, MiraviaService $miraviaService)
+    public function __construct(DatabaseService $dbService, MiraklService $miraklService, MakroService $makroService, MiraviaService $miraviaService, KuantoService $kuantoService)
     {
         $this->dbService = $dbService;
         $this->miraklService = $miraklService;
         $this->makroService = $makroService;
         $this->miraviaService = $miraviaService;
+        $this->kuantoService = $kuantoService;
         $this->shops = $this->getShopsId();
 
     }
@@ -58,6 +60,25 @@ class OrdersService
         if($market && $state){
             switch($market){
                
+                //Kuanto
+                case '17' :
+                    $ordersRequest = $this->kuantoService->getOrders( $state, $limit, $offset);
+                    if($ordersRequest['status'] === 'success'){
+                        $orders = $ordersRequest['details']['response'];
+                        $ordersProcessed = $this->kuantoService->processOrders('17',$country, $orders);
+                        if($ordersProcessed['status'] === 'success'){
+                            $shop = $this->shops[$country];
+                            $ordersCreated = $this->createOrders($shop,'17',$ordersProcessed['details']['response']);
+                            return array("status"=> "succes","details"=> $ordersCreated);
+                        }
+                        else{
+                            return array("status"=> "error","details"=> $ordersProcessed['details']);
+                        }
+
+                    }
+                    else{
+                        return array("status"=> "error","details"=> $ordersRequest['details']);
+                    }
                 //Leroy merlin
                 case '21' :
                     $ordersRequest = $this->miraklService->getOrders('leroy',$country, $state, $limit, $offset);
@@ -77,7 +98,7 @@ class OrdersService
                     else{
                         return array("status"=> "error","details"=> $ordersRequest['details']);
                     }
-                  
+                //Miravia 
                 case '30':
                     $ordersRequest = $this->miraviaService->getOrders( $state, $limit, $offset);
                     if($ordersRequest['status'] === 'success'){
@@ -98,27 +119,28 @@ class OrdersService
                     else{
                         return array("status"=> "error","details"=> $ordersRequest['details']);
                     }
-                    case '28':
-                        $ordersRequest = $this->makroService->getOrders(false, $state, $limit, $offset);
-                        if($ordersRequest['status'] === 'success'){
-                            
-                            $orders = $ordersRequest['details']->items;
-                            
-                            $ordersProcessed = $this->makroService->processOrders('28',$country, $orders);
-                            
-                            if($ordersProcessed['status'] === 'success'){
-                                $shop = $this->shops[$country];
-                                $ordersCreated = $this->createOrders($shop,'28',$ordersProcessed['details']['response']);
-                                return array("status"=> "success","details"=> $ordersCreated);
-                            }
-                            else{
-                                return array("status"=> "error","details"=> $ordersProcessed['details']);
-                            }
-                            
+                //Makro
+                case '28':
+                    $ordersRequest = $this->makroService->getOrders(false, $state, $limit, $offset);
+                    if($ordersRequest['status'] === 'success'){
+                        
+                        $orders = $ordersRequest['details']->items;
+                        
+                        $ordersProcessed = $this->makroService->processOrders('28',$country, $orders);
+                        
+                        if($ordersProcessed['status'] === 'success'){
+                            $shop = $this->shops[$country];
+                            $ordersCreated = $this->createOrders($shop,'28',$ordersProcessed['details']['response']);
+                            return array("status"=> "success","details"=> $ordersCreated);
                         }
                         else{
-                            return array("status"=> "error","details"=> $ordersRequest['details']);
-                        }    
+                            return array("status"=> "error","details"=> $ordersProcessed['details']);
+                        }
+                        
+                    }
+                    else{
+                        return array("status"=> "error","details"=> $ordersRequest['details']);
+                    }    
                     
                 default :
                     return 'No market defined';
