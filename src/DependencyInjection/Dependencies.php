@@ -19,6 +19,7 @@ use Services\KauflandService;
 use Services\ManomanoService;
 use Services\MiraviaService;
 use Services\KuantoService;
+use Services\AnkorService;
 
 
 return function (Container $container) {
@@ -179,6 +180,22 @@ return function (Container $container) {
         );
     });
 
+    // Ankorstore Configurar el array de configuración adicional
+    $container->set('ankorConfig', function () {
+        require __DIR__ . '/../../config.php';
+        $ankorConfig = $config['ankorConfig']; 
+        return $ankorConfig;
+    }); 
+
+    // Configurar Ankorstore Service
+    $container->set(AnkorService::class, function ($container) {
+        
+        return new AnkorService(
+            $container->get(DatabaseService::class),
+            $container->get('ankorConfig')
+        );
+    });
+
 
 
     // Configurar InvoicesService
@@ -201,6 +218,7 @@ return function (Container $container) {
             $container->get(MakroService::class),
             $container->get(MiraviaService::class),
             $container->get(KuantoService::class),
+            $container->get(AnkorService::class),
         );
     });
 

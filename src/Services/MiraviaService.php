@@ -12,7 +12,7 @@ class MiraviaService
     private $access_token;
 
     private $path = "https://api.miravia.es/rest"; 
-
+    //DOC: https://open.miravia.com/apps/doc/getting_started?spm=euspain.27008829.0.0.44387c73slpDIO
  
 
     public function __construct(DatabaseService $dbService, array $miraviaConfig)

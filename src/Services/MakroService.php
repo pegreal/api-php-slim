@@ -16,6 +16,7 @@ class MakroService
         'orders' => 'https://app-order-management.prod.de.metro-marketplace.cloud/openapi/v2/'
     ];
 
+    //DOC: https://developer.metro-selleroffice.com/docs/
       
  
     public function __construct(DatabaseService $dbService, array $makroConfig)

@@ -18,6 +18,8 @@ class MiraklService
         'carrefour' => 'https://carrefoures-prod.mirakl.net/api/'
     ];
 
+    //DOC: (loggin) https://help.mirakl.net/help/api-doc/seller/mmp.html
+
     private $countryLeroy = [
         '001' => 'fr',
         '002' => 'es',

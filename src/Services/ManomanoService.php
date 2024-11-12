@@ -9,6 +9,8 @@ class ManomanoService
     private $dbService;
     private $mailService;
 
+    //DOC: https://www.manomano.dev/#intro
+
     public function __construct(DatabaseService $dbService, MailService $mailService)
     {
         $this->dbService = $dbService;

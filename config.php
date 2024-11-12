@@ -50,6 +50,10 @@ $config = [
     'kuantoConfig' => [
         'client_token' => $_ENV['KUANTO_TOKEN']
     ],
+    'ankorConfig' => [
+        'client_key' => $_ENV['ANKOR_KEY'],
+        'client_secret' => $_ENV['ANKOR_SECRET']
+    ],
     'mailConfig' => [
         'host' => $_ENV['MAIL_HOST'],
         'port' => $_ENV['MAIL_PORT'],

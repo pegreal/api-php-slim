@@ -10,15 +10,17 @@ class OrdersService
     private $makroService;
     private $miraviaService;
     private $kuantoService;
+    private $ankorService;
     private $shops;
 
-    public function __construct(DatabaseService $dbService, MiraklService $miraklService, MakroService $makroService, MiraviaService $miraviaService, KuantoService $kuantoService)
+    public function __construct(DatabaseService $dbService, MiraklService $miraklService, MakroService $makroService, MiraviaService $miraviaService, KuantoService $kuantoService, AnkorService $ankorService)
     {
         $this->dbService = $dbService;
         $this->miraklService = $miraklService;
         $this->makroService = $makroService;
         $this->miraviaService = $miraviaService;
         $this->kuantoService = $kuantoService;
+        $this->ankorService = $ankorService;
         $this->shops = $this->getShopsId();
 
     }
@@ -140,7 +142,29 @@ class OrdersService
                     }
                     else{
                         return array("status"=> "error","details"=> $ordersRequest['details']);
-                    }    
+                    }
+                    //AnkorStore
+                case '32':
+                    $ordersRequest = $this->ankorService->getOrders($state, $limit, $offset);
+                    if($ordersRequest['status'] === 'success'){
+                        
+                        $orders = $ordersRequest['details']['response']->data;
+                        
+                        $ordersProcessed = $this->ankorService->processOrders('32',$country, $orders);
+                        
+                        if($ordersProcessed['status'] === 'success'){
+                            $shop = $this->shops[$country];
+                            $ordersCreated = $this->createOrders($shop,'32',$ordersProcessed['details']['response']);
+                            return array("status"=> "success","details"=> $ordersCreated);
+                        }
+                        else{
+                            return array("status"=> "error","details"=> $ordersProcessed['details']);
+                        }
+                        
+                    }
+                    else{
+                        return array("status"=> "error","details"=> $ordersRequest['details']);
+                    }      
                     
                 default :
                     return 'No market defined';
