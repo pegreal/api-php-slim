@@ -39,10 +39,14 @@ class OrdersService
         else return [];
     }
 
-    public function getOrders($userId)
+    public function getOrders($market, $limit)
     {
- 
-        return 'toDo';
+        if($market === '0') $action = "SELECT DISTINCT strNumPedido, intMarket, strPais, strDireccionEnvio, fchFechaPago, intEstado, fchFechaImport, strClienteNombre, fltTotal FROM tblPedidosAPI ORDER BY intEstado ASC, fchFechaPago DESC LIMIT $limit ";
+        else $action = "SELECT DISTINCT strNumPedido, intMarket, strPais, strDireccionEnvio, fchFechaPago, intEstado, fchFechaImport, strClienteNombre, fltTotal FROM tblPedidosAPI  WHERE intMarket = $market ORDER BY intEstado ASC, fchFechaPago DESC LIMIT $limit ";
+
+        $ordersData = $this->dbService->ejecutarConsulta($action);
+        $this->dbService->cerrarConexion();
+        return $ordersData;
     }
 
     public function orderExists($order)
@@ -55,6 +59,16 @@ class OrdersService
             return true;
         }
         else return false;
+    }
+
+    public function updateOrderState($idOrderMarket, $market, $state) {
+        
+        $actionRequest = "UPDATE tblPedidosAPI SET intEstado='$state' WHERE tblPedidosAPI.strNumPedido = '$idOrderMarket'";
+
+        $this->dbService->ejecutarConsulta($actionRequest);
+
+        return array("status"=> "success","details"=> $idOrderMarket);
+        
     }
     
     public function sincroOrders($market, $country, $state, $limit, $offset){
