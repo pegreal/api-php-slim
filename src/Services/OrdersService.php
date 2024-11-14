@@ -11,9 +11,17 @@ class OrdersService
     private $miraviaService;
     private $kuantoService;
     private $ankorService;
+    private $excelService;
     private $shops;
 
-    public function __construct(DatabaseService $dbService, MiraklService $miraklService, MakroService $makroService, MiraviaService $miraviaService, KuantoService $kuantoService, AnkorService $ankorService)
+    public function __construct(
+        DatabaseService $dbService, 
+        MiraklService $miraklService, 
+        MakroService $makroService, 
+        MiraviaService $miraviaService, 
+        KuantoService $kuantoService, 
+        AnkorService $ankorService,
+        ExcelService $excelService)
     {
         $this->dbService = $dbService;
         $this->miraklService = $miraklService;
@@ -21,6 +29,7 @@ class OrdersService
         $this->miraviaService = $miraviaService;
         $this->kuantoService = $kuantoService;
         $this->ankorService = $ankorService;
+        $this->excelService = $excelService;
         $this->shops = $this->getShopsId();
 
     }
@@ -39,7 +48,7 @@ class OrdersService
         else return [];
     }
 
-    public function getOrders($market, $limit)
+    public function getOrders($market, $limit, $allData = false)
     {
         if($market === '0') $action = "SELECT DISTINCT strNumPedido, intMarket, strPais, strDireccionEnvio, fchFechaPago, intEstado, fchFechaImport, strClienteNombre, fltTotal FROM tblPedidosAPI ORDER BY intEstado ASC, fchFechaPago DESC LIMIT $limit ";
         else $action = "SELECT DISTINCT strNumPedido, intMarket, strPais, strDireccionEnvio, fchFechaPago, intEstado, fchFechaImport, strClienteNombre, fltTotal FROM tblPedidosAPI  WHERE intMarket = $market ORDER BY intEstado ASC, fchFechaPago DESC LIMIT $limit ";
@@ -49,9 +58,21 @@ class OrdersService
         return $ordersData;
     }
 
+    public function getOrderData($orders)
+    {
+        if(is_array($orders)){
+            $stringOrders = $this->createStringOrders($orders);
+            $action = "SELECT * FROM tblPedidosAPI  WHERE strNumPedido IN ($stringOrders)  ";
+        }
+        else{
+            $action = "SELECT * FROM tblPedidosAPI  WHERE strNumPedido = $orders ";
+        }
+        $ordersData = $this->dbService->ejecutarConsulta($action);
+        return $ordersData;
+    }
+
     public function orderExists($order)
     {
- 
         $actionRequest = "SELECT * FROM tblPedidosAPI WHERE strNumPedido = '$order'";
         $orderRequest = $this->dbService->ejecutarConsulta($actionRequest);
         
@@ -61,13 +82,25 @@ class OrdersService
         else return false;
     }
 
-    public function updateOrderState($idOrderMarket, $market, $state) {
+    public function updateOrderState($orders, $market, $state, $date = null) {
+
+        if(is_array($orders)){
+            $stringOrders = $this->createStringOrders($orders);
+            if($date){
+                $action = "UPDATE tblPedidosAPI SET intEstado='$state', fchFechaImport = '$date' WHERE strNumPedido IN ($stringOrders) ";
+            }
+            else{
+                $action = "UPDATE tblPedidosAPI SET intEstado='$state' WHERE strNumPedido IN ($stringOrders) ";
+            }
+        }
+        else{
+            $action = "UPDATE tblPedidosAPI SET intEstado='$state' WHERE strNumPedido = '$orders'";
+        }
         
-        $actionRequest = "UPDATE tblPedidosAPI SET intEstado='$state' WHERE tblPedidosAPI.strNumPedido = '$idOrderMarket'";
+        $this->dbService->ejecutarConsulta($action);
+        $this->dbService->cerrarConexion();
 
-        $this->dbService->ejecutarConsulta($actionRequest);
-
-        return array("status"=> "success","details"=> $idOrderMarket);
+        return array("status"=> "success","details"=> $orders);
         
     }
     
@@ -329,7 +362,22 @@ class OrdersService
             return array('status' => 'error', 'details' => $error);
            
         }
-    }    
+    } 
+
+    public function createStringOrders($orders){
+        $stringOrders = "'";
+        $stringOrders .= implode("','",$orders);
+        $stringOrders .= "'";
+        return $stringOrders;
+    }
+    
+    public function createOrdersFile ($orders) {
+        $ordersData = $this->getOrderData($orders);
+        $ordersFileStream = $this->excelService->createOrdersFile($ordersData);
+        $date = date('Y-m-d');
+        $updateState = $this->updateOrderState($orders, null, 2, $date);
+        return $ordersFileStream;
+    }
     
 
     

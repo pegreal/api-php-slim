@@ -3,6 +3,7 @@
 use DI\Container;
 use Services\DatabaseService;
 use Services\MailService;
+use Services\ExcelService;
 
 use Controllers\AuthController;
 use Controllers\OrdersController;
@@ -219,6 +220,7 @@ return function (Container $container) {
             $container->get(MiraviaService::class),
             $container->get(KuantoService::class),
             $container->get(AnkorService::class),
+            $container->get(ExcelService::class),
         );
     });
 

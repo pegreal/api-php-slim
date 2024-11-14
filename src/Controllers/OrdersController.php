@@ -101,10 +101,35 @@ class OrdersController
             $response->getBody()->write("Token inválido o falta información");
             return $response->withStatus(401)->withHeader('Content-Type', 'text/plain');
         }
-        
-        
-        
-        
+    }
+
+    public function ordersFile(Request $request, Response $response, $args)
+    {
+
+        $decodedTokenData = $request->getAttribute('decoded_token_data');
+        $decodedTokenData = json_decode(json_encode($decodedTokenData), true);
+         if ($decodedTokenData && isset($decodedTokenData['data']['user_id'])) {
+
+            $data = $request->getParsedBody();
+            $orders = $data['orders'];
+
+            $userId = $decodedTokenData['data']['user_id'];
+            $userPermises = $decodedTokenData['data']['user_permision'];
+
+            $orderData = $this->ordersService->createOrdersFile($orders);
+            
+            $response = $response->withHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response = $response->withHeader('Content-Disposition', 'attachment; filename="file.xlsx"');
+
+            $response->getBody()->write(stream_get_contents($orderData));
+            //Cerrar flujo de la memoria
+            fclose($orderData);
+            return $response;
+             
+         }else {
+            $response->getBody()->write("Token inválido o falta información");
+            return $response->withStatus(401)->withHeader('Content-Type', 'text/plain');
+        }
     }
     
     
