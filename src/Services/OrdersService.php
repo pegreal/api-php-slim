@@ -65,7 +65,7 @@ class OrdersService
             $action = "SELECT * FROM tblPedidosAPI  WHERE strNumPedido IN ($stringOrders)  ";
         }
         else{
-            $action = "SELECT * FROM tblPedidosAPI  WHERE strNumPedido = $orders ";
+            $action = "SELECT * FROM tblPedidosAPI  WHERE strNumPedido = '$orders' ";
         }
         $ordersData = $this->dbService->ejecutarConsulta($action);
         return $ordersData;

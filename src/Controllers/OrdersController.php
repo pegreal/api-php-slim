@@ -30,11 +30,16 @@ class OrdersController
             $userPermises = $decodedTokenData['data']['user_permision'];
 
             $queryParams = $request->getQueryParams();
-            $market = $queryParams['market'];
-            $limit = $queryParams['limit'];
-            //$orders = $queryParams['orders'] || null;
+            $market = isset($queryParams['market']) ? $queryParams['market'] : "0";
+            $limit = isset($queryParams['limit']) ? $queryParams['limit'] : "10";
+            $orders = isset($queryParams['orders']) ? $queryParams['orders'] : false;
 
-            $ordersData = $this->ordersService->getOrders($market, $limit);
+            if($orders) {
+                $ordersData = $this->ordersService->getOrderData($orders);
+            }
+            else {
+                $ordersData = $this->ordersService->getOrders($market, $limit);
+            } 
                                               
             $response->getBody()->write(json_encode(array('user_id' => $userId, 'permision'=> $userPermises, 'orders' => $ordersData)));
             return $response->withHeader('Content-Type', 'application/json');
