@@ -136,6 +136,29 @@ class OrdersController
             return $response->withStatus(401)->withHeader('Content-Type', 'text/plain');
         }
     }
+    public function ordersSend(Request $request, Response $response, $args)
+    {
+
+        $decodedTokenData = $request->getAttribute('decoded_token_data');
+        $decodedTokenData = json_decode(json_encode($decodedTokenData), true);
+         if ($decodedTokenData && isset($decodedTokenData['data']['user_id'])) {
+
+            $data = $request->getParsedBody();
+            $orders = $data['orders'];
+
+            $userId = $decodedTokenData['data']['user_id'];
+            $userPermises = $decodedTokenData['data']['user_permision'];
+
+            $orderData = $this->ordersService->ordersSend($orders);
+            
+            $response->getBody()->write(json_encode(array('user_id' => $userId, 'permision'=> $userPermises, 'orders' => $orderData)));
+            return $response->withHeader('Content-Type', 'application/json');
+             
+         }else {
+            $response->getBody()->write("Token inválido o falta información");
+            return $response->withStatus(401)->withHeader('Content-Type', 'text/plain');
+        }
+    }
     
     
     

@@ -25,6 +25,7 @@ return function (App $app) {
         $group->get('/sincro', OrdersController::class . ':sincroOrders');
         $group->post('/file', OrdersController::class . ':ordersFile');
         $group->post('/state', OrdersController::class . ':updateOrderState');
+        $group->post('/send', OrdersController::class . ':ordersSend');
     });
 
     $app->group('/invoices', function ($group) {

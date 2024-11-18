@@ -48,7 +48,7 @@ class OrdersService
         else return [];
     }
 
-    public function getOrders($market, $limit, $allData = false)
+    public function getOrders($market, $limit )
     {
         if($market === '0') $action = "SELECT DISTINCT strNumPedido, intMarket, strPais, strDireccionEnvio, fchFechaPago, intEstado, fchFechaImport, strClienteNombre, fltTotal FROM tblPedidosAPI ORDER BY intEstado ASC, fchFechaPago DESC LIMIT $limit ";
         else $action = "SELECT DISTINCT strNumPedido, intMarket, strPais, strDireccionEnvio, fchFechaPago, intEstado, fchFechaImport, strClienteNombre, fltTotal FROM tblPedidosAPI  WHERE intMarket = $market ORDER BY intEstado ASC, fchFechaPago DESC LIMIT $limit ";
@@ -68,6 +68,26 @@ class OrdersService
             $action = "SELECT * FROM tblPedidosAPI  WHERE strNumPedido = '$orders' ";
         }
         $ordersData = $this->dbService->ejecutarConsulta($action);
+        return $ordersData;
+    }
+    public function getOrdersSend($orders )
+    {
+        if(is_array($orders)){
+            $stringOrders = $this->createStringOrders($orders);
+            $action = "SELECT DISTINCT P.strNumPedido, P.intMarket, P.strPais, P.strClienteNombre, P.strClienteApellido , 
+                        COALESCE(I.strCarrier, '') AS strCarrier, 
+                        COALESCE(I.strTracking, '') AS strTracking
+                    FROM tblPedidosAPI P
+                    LEFT JOIN tblfacturasapp I 
+                    ON P.strNumPedido = I.strIdMarket
+                    WHERE P.strNumPedido 
+                    IN ($stringOrders) ";
+        }
+        else{
+            $action = "SELECT DISTINCT strNumPedido, intMarket, strPais, strClienteNombre, strClienteApellido FROM tblPedidosAPI  WHERE strNumPedido = '$orders' ";
+        }
+        $ordersData = $this->dbService->ejecutarConsulta($action);
+        $this->dbService->cerrarConexion();
         return $ordersData;
     }
 
@@ -377,6 +397,15 @@ class OrdersService
         $date = date('Y-m-d');
         $updateState = $this->updateOrderState($orders, null, 2, $date);
         return $ordersFileStream;
+    }
+
+    public function ordersSend ($orders){
+
+        //get ordersData
+        $ordersData = $this->getOrdersSend($orders);
+        //getTrackings
+        return $ordersData;
+
     }
     
 
