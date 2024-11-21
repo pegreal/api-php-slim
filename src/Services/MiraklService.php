@@ -18,6 +18,7 @@ class MiraklService
         'carrefour' => 'https://carrefoures-prod.mirakl.net/api/'
     ];
 
+    
     //DOC: (loggin) https://help.mirakl.net/help/api-doc/seller/mmp.html
 
     private $countryLeroy = [
@@ -32,8 +33,6 @@ class MiraklService
     {
         $this->dbService = $dbService;
         $this->miraklConfig = $miraklConfig;
-
-
     }
 
     private function loadCredentials($miraklMarket) {
@@ -299,6 +298,103 @@ class MiraklService
 
     }
 
+    public function getCarrierData($label, $market){
+
+        $consulta = "SELECT * FROM tblcarriers WHERE strLabel = '$label' AND idMarket = '$market'";
+        $resultado = $this->dbService->ejecutarConsulta($consulta);
+        if (count($resultado) > 0) {
+            $fila = $resultado[0];
+            return $fila;
+        }
+        else return false;
+
+    }
+
+
+
+    public function sendTracking($miraklMarket, $idMarket, $country, $order, $carrier, $tracking)
+    {
+               
+        $this->loadMiraklPath($miraklMarket);
+
+        $country = strtolower($country);
+
+        //Leroy
+        if($miraklMarket == 'leroy') {
+            $miraklMarket = 'leroy_'.$country;
+        }
+        $this->loadMiraklIdShop($miraklMarket);
+
+        $this->loadCredentials($miraklMarket);
+
+        $token = $this->access_token;
+        $url = $this->miraklPath.'orders/'.$order.'/tracking&shop_id='.$this->miraklIdShop;
+        $headers = array(
+            'Authorization: ' . $token,
+            'Accept: application/json'
+        );
+
+        $carrierInfo = $this->getCarrierData($carrier, $idMarket);
+
+        if($carrierInfo){
+            $trackingInfo = array(
+                   
+                "carrier_name"=> $carrierInfo['strCode'],
+                "tracking_number"=> $tracking,
+                "carrier_url" =>$carrierInfo['strUrl']
+              );
+        }else{
+            //toDo
+        }
+        
+
+        $request = $this->apiRequest('PUT', $url, $headers, $trackingInfo);
+        if ($request['error']) {
+            return array("status"=> "error","details"=> $request['error']);
+          } else {
+  
+          return array("status"=> "success","details"=> array("response" => json_decode($request['response']), "code"=> $request['httpcode']));
+              
+          }
+    
+       
+    
+    }
+    public function sendConfirm($miraklMarket, $country, $order)
+    {
+               
+        $this->loadMiraklPath($miraklMarket);
+
+        $country = strtolower($country);
+
+        //Leroy
+        if($miraklMarket == 'leroy') {
+            $miraklMarket = 'leroy_'.$country;
+        }
+        $this->loadMiraklIdShop($miraklMarket);
+
+        $this->loadCredentials($miraklMarket);
+
+        $token = $this->access_token;
+        $url = $this->miraklPath.'orders/'.$order.'/ship&shop_id='.$this->miraklIdShop;
+        $headers = array(
+            'Authorization: ' . $token,
+            'Accept: application/json'
+        );
+
+        
+        $request = $this->apiRequest('PUT', $url, $headers, '');
+        if ($request['error']) {
+            return array("status"=> "error","details"=> $request['error']);
+          } else {
+  
+          return array("status"=> "success","details"=> array("response" => json_decode($request['response']), "code"=> $request['httpcode']));
+              
+          }
+    
+       
+    
+    }
      /* ---------------------------------
                 FIN   Orders
      --------------------------------- */

@@ -313,6 +313,100 @@ class AnkorService
         return null; // Si no se encuentra el objeto, devuelve null
     }
 
+    public function getOrderUuid($orderId){
+        
+        $consulta="SELECT * FROM tblPedidosAPI WHERE strNumPedido = '$orderId'";
+        $resultado= $this->dbService->ejecutarConsulta($consulta);
+                
+        return $resultado[0];
+        
+    }
+
+
+    // QuotaId for Send Order
+    public function getSendQuota($order){
+        
+        $this->loadCredentials();
+
+        $orderData = $this->getOrderUuid($order);
+        $orderUuid = $orderData['strInfoCarrier5'];
+
+        $url = $this->path.'orders/'.$orderUuid.'/ship/custom';
+        
+        $headers = array(
+            'Accept: application/vnd.api+json',
+            'Authorization: Bearer '.$this->access_token
+        );
+
+        $shipping = [
+            "shipping" => [
+                "parcels" => [
+                    [
+                        "length" => 40,
+                        "width" => 40,
+                        "height" => 40,
+                        "distanceUnit" => "cm",
+                        "weight" => 5000,
+                        "massUnit" => "g"
+                    ]
+                ]
+            ]
+        ];
+
+        $request = $this->apiRequest('POST', $url, $headers, $shipping);
+        if ($request['error']) {
+            return array("status"=> "error","details"=> $request['error']);
+          } else {
+  
+          return array("status"=> "success","details"=> array("response" => json_decode($request['response']), "code"=> $request['httpcode']));
+              
+          }
+    }
+
+    public function getCarrierData($label, $market){
+
+        $consulta = "SELECT * FROM tblcarriers WHERE strLabel = '$label' AND idMarket = '$market'";
+        $resultado = $this->dbService->ejecutarConsulta($consulta);
+        if (count($resultado) > 0) {
+            $fila = $resultado[0];
+            return $fila;
+        }
+        else return false;
+
+    }
+
+    public function confirmSend($quotaId, $carrier, $tracking){
+        
+        $this->loadCredentials();
+
+        $carrierData = $this->getCarrierData($carrier, '32');
+        $urlCarrier = $carrierData['strUrl'];
+
+        $shipping = [
+            "tracking" => [
+                "trackingLink" => $urlCarrier.$tracking
+            ]
+        ];
+        
+        $url = $this->path.'shipping-quotes/'.$quotaId.'/confirm';
+        
+        $headers = array(
+            'Accept: application/vnd.api+json',
+            'Authorization: Bearer '.$this->access_token
+        );
+
+
+        $request = $this->apiRequest('POST', $url, $headers, $shipping);
+        if ($request['error']) {
+            return array("status"=> "error","details"=> $request['error']);
+          } else {
+  
+          return array("status"=> "success","details"=> array("response" => json_decode($request['response']), "code"=> $request['httpcode']));
+              
+          }
+    }
+
+
      /* ---------------------------------
                 FIN   Orders
      --------------------------------- */

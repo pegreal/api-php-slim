@@ -373,6 +373,77 @@ class MakroService
 
     }
 
+    public function getCarrierData($label, $market){
+
+        $consulta = "SELECT * FROM tblcarriers WHERE strLabel = '$label' AND idMarket = '$market'";
+        $resultado = $this->dbService->ejecutarConsulta($consulta);
+        if (count($resultado) > 0) {
+            $fila = $resultado[0];
+            return $fila;
+        }
+        else return false;
+
+    }
+
+    public function orderItemList($order){
+       
+        $consulta="SELECT * FROM tblPedidosAPI WHERE strNumPedido = '$order'";
+        $resultado= $this->dbService->ejecutarConsulta($consulta);
+
+        $order_item_id_list = array();
+                    foreach ($resultado as $orderLine) {
+                        $order_item_id_list[] = $orderLine['strInfoCarrier5'];
+                    }
+
+        return $order_item_id_list;
+        
+        
+    }
+
+    public function confirmSend($order, $carrier, $tracking)
+    {
+
+        $carrierData = $this->getCarrierData($carrier, '28');
+        $carrierId = $carrierData['strCode'];
+        
+        $trackings [] = array(
+            "trackingId"=> $tracking,
+            "carrier" => $carrierId    
+          );
+
+        $orderItemList = $this->orderItemList($order);
+
+
+        $this->loadmakroPath('orders');
+        $report = array();
+
+        foreach ($orderItemList as $idLine) {  
+        $url = $this->makroPath . 'order-lines/'.$idLine.'/ship';
+
+        $timestamp = $this->timestamp();
+        $signature = $this->signRequest('PUT', $url, json_encode($tracking), $timestamp);
+
+        $headers = $headers = $this->getHeaders($timestamp, $signature);
+
+        $request = $this->apiRequest('PUT',
+                $url,
+                $headers,
+                $tracking
+            );
+            
+        if ($request['error']) {
+            //return array("status" => "error", "details" => $request['error']);
+            $report[] = array("line" => $idLine, "details" => $request['error']);
+        } else {
+            //return array("status" => "success", "details" => json_decode($request['response']));
+            $report[] = array("line" => $idLine, "details" => json_decode($request['response']));
+
+        }
+        }    
+        return array("status" => "success", "details" => $report);
+    }
+
+
      /* ---------------------------------
                 FIN   Orders
      --------------------------------- */

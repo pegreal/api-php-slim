@@ -309,6 +309,71 @@ class MiraviaService
 
     }
 
+    public function getCarrierData($label, $market){
+
+        $consulta = "SELECT * FROM tblcarriers WHERE strLabel = '$label' AND idMarket = '$market'";
+        $resultado = $this->dbService->ejecutarConsulta($consulta);
+        if (count($resultado) > 0) {
+            $fila = $resultado[0];
+            return $fila;
+        }
+        else return false;
+
+    }
+
+    public function orderItemList($order){
+       
+        $consulta="SELECT * FROM tblPedidosAPI WHERE strNumPedido = '$order'";
+        $resultado= $this->dbService->ejecutarConsulta($consulta);
+
+        $order_item_id_list = array();
+                    foreach ($resultado as $orderLine) {
+                        $order_item_id_list[] = (int)$orderLine['strInfoCarrier5'];
+                    }
+
+        return $order_item_id_list;
+        
+        
+    }
+
+
+    public function sendConfrim($order, $carrier, $tracking){
+
+  
+
+        $this->loadCredentials();
+
+        $itemList = $this->orderItemList($order);
+        $carrierData = $this->getCarrierData($carrier, '30');
+        $carrierCode = $carrierData['strCode'];
+        
+        $requestParams = $this->getParams('');
+        $requestParams['payload'] = json_encode(array("order_id"=> $order,
+                                           "order_item_id_list" => $itemList,
+                                           "shipping_provider_code"=> $carrierCode,
+                                           "tracking_number" => $tracking));
+        
+        $sign = $this->generateSign($requestParams, '/v2/order/fulfill');
+        $requestParams['sign'] = $sign;
+
+        $url = $this->path.'/v2/order/fulfill';
+
+        $headers = array(
+            "Content-Type: application/json;charset=utf-8",
+            "Accept: application/json"
+        );
+
+        $request = $this->apiRequest('POST', $url, $headers, $requestParams);
+        if ($request['error']) {
+            return array("status"=> "error","details"=> $request['error']);
+          } else {
+  
+          return array("status"=> "success","details"=> array("response" => json_decode($request['response']), "code"=> $request['httpcode']));
+              
+          }
+
+    }
+
      /* ---------------------------------
                 FIN   Orders
      --------------------------------- */

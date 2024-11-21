@@ -223,6 +223,45 @@ class KuantoService
         return $resultado;
     }
 
+    public function getCarrierData($label, $market){
+
+        $consulta = "SELECT * FROM tblcarriers WHERE strLabel = '$label' AND idMarket = '$market'";
+        $resultado = $this->dbService->ejecutarConsulta($consulta);
+        if (count($resultado) > 0) {
+            $fila = $resultado[0];
+            return $fila;
+        }
+        else return false;
+
+    }
+
+    public function sendConfirm($order, $carrier, $tracking){
+
+        $carrierData = $this->getCarrierData($carrier, '17');
+        $carrierId = $carrierData['strCode'];
+        $trackingInfo = array(
+            "trackingId"=> $tracking,
+            "courierId" => $carrierId      
+          );
+
+        $url = $this->path."/kms/orders/".$order."/send";
+
+        $headers = array(
+            'Accept: application/json',
+            'x-api-key: '.$this->kuantoConfig['client_token']  
+        );
+
+        $request = $this->apiRequest('PATCH', $url, $headers, $trackingInfo);
+        if ($request['error']) {
+            return array("status"=> "error","details"=> $request['error']);
+          } else {
+  
+          return array("status"=> "success","details"=> array("response" => json_decode($request['response']), "code"=> $request['httpcode']));
+              
+          }
+
+    }
+
      /* ---------------------------------
                 FIN   Orders
      --------------------------------- */
