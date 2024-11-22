@@ -400,7 +400,7 @@ class MakroService
         
     }
 
-    public function confirmSend($order, $carrier, $tracking)
+    public function sendConfirm($order, $carrier, $tracking)
     {
 
         $carrierData = $this->getCarrierData($carrier, '28');

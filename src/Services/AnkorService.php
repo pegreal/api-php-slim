@@ -375,8 +375,7 @@ class AnkorService
 
     }
 
-    public function confirmSend($quotaId, $carrier, $tracking){
-        
+    public function confirmQuota ($quotaId, $carrier, $tracking){
         $this->loadCredentials();
 
         $carrierData = $this->getCarrierData($carrier, '32');
@@ -404,6 +403,36 @@ class AnkorService
           return array("status"=> "success","details"=> array("response" => json_decode($request['response']), "code"=> $request['httpcode']));
               
           }
+    }
+
+    public function sendConfirm($order, $carrier, $tracking){
+
+        $quotaRequest = $this->getSendQuota($order);
+
+        $quoteId = false;
+        if ($quotaRequest['error']) {
+            return array("status"=> "error","details"=> $quotaRequest['error']);
+        }
+        else {
+            $quotaData = $quotaRequest['details']['response'];
+            $quoteId = $quotaData->data->attributes->shippingOverview->latestQuote->id;
+
+            if($quoteId){
+                $confirmRequest = $this->confirmQuota($quoteId, $carrier, $tracking);
+                if ($confirmRequest['error']) {
+                    return array("status"=> "error","details"=> $confirmRequest['error']);
+                  } else {
+                    return array("status"=> "success","details"=> $confirmRequest['details']);
+                }
+            }
+            else{
+                return array("status"=> "error","details"=> "No quotaId recived!");
+            }
+
+        }
+        
+        
+       
     }
 
 

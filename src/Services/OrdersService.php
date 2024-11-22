@@ -399,13 +399,107 @@ class OrdersService
         return $ordersFileStream;
     }
 
-    public function ordersSend ($orders){
+    public function ordersSendData ($orders){
 
         //get ordersData
         $ordersData = $this->getOrdersSend($orders);
         //getTrackings
         return $ordersData;
 
+    }
+
+    public function ordersSend ($ordersData) {
+
+        $report = array();
+
+        foreach($ordersData as $orderData){
+
+            $market = $orderData['intMarket'];
+            $country = $orderData['strPais'];
+            $order = $orderData['strNumPedido'];
+            $carrier = $orderData['strCarrier'];
+            $tracking = $orderData['strTracking'];
+            $update = isset($orderData['update']) ? $orderData['update'] : false;
+
+            try{
+            
+            switch($market){
+                //Kuanto
+                case '17' :
+                    $sendRequest = $this->kuantoService->sendConfirm($order, $carrier, $tracking);
+                    if($sendRequest['status'] === 'success'){
+                        $updateState = $this->updateOrderState($order, null, 3);
+                        $report[] = array( "order" => $order, "status"=> "success","details"=> $sendRequest['details']);
+                    }
+                    else{
+                        $report[] = array( "order" => $order, "status"=> "error","details"=> $sendRequest['details']);
+                    }
+                    break;
+                //Leroy merlin
+                case '21' :
+                    $trackingRequest = $this->miraklService->sendTracking("leroy", $market, $country, $order, $carrier, $tracking);
+                    if($trackingRequest['status'] === 'success'){
+                        $report[] = array( "order" => $order, "status"=> "success","details"=> $trackingRequest['details']);
+                    }
+                    else{
+                        $report[] = array( "order" => $order, "status"=> "error","details"=> $trackingRequest['details']);
+                    }
+                    if(!$update)
+                    {
+                        $sendRequest = $this->miraklService->sendConfirm("leroy", $country, $order);
+                        if($sendRequest['status'] === 'success'){
+                            $updateState = $this->updateOrderState($order, null, 3);
+                            $report[] = array( "order" => $order, "status"=> "success","details"=> $sendRequest['details']);
+                        }
+                        else{
+                            $report[] = array( "order" => $order, "status"=> "error","details"=> $sendRequest['details']);
+                        }
+                    }
+                    break;
+                    
+                //Makro
+                case '28':
+                    $sendRequest = $this->makroService->sendConfirm($order, $carrier, $tracking);
+                    if($sendRequest['status'] === 'success'){
+                        $updateState = $this->updateOrderState($order, null, 3);
+                        $report[] = array( "order" => $order, "status"=> "success","details"=> $sendRequest['details']);
+                    }
+                    else{
+                        $report[] = array( "order" => $order, "status"=> "error","details"=> $sendRequest['details']);
+                    }
+                    break;
+                //Miravia 
+                case '30':
+                    $sendRequest = $this->miraviaService->sendConfirm($order, $carrier, $tracking);
+                    if($sendRequest['status'] === 'success'){
+                        $updateState = $this->updateOrderState($order, null, 3);
+                        $report[] = array( "order" => $order, "status"=> "success","details"=> $sendRequest['details']);
+                    }
+                    else{
+                        $report[] = array( "order" => $order, "status"=> "error","details"=> $sendRequest['details']);
+                    }
+                    break;
+                //AnkorStore
+                case '32':
+                    $sendRequest = $this->ankorService->sendConfirm($order, $carrier, $tracking);
+                    if($sendRequest['status'] === 'success'){
+                        $updateState = $this->updateOrderState($order, null, 3);
+                        $report[] = array( "order" => $order, "status"=> "success","details"=> $sendRequest['details']);
+                    }
+                    else{
+                        $report[] = array( "order" => $order, "status"=> "error","details"=> $sendRequest['details']);
+                    }
+                    break;
+                
+
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $report[] = array("order" => $order, "status" => "error", "details" => $error);
+           
+        }
+        }
+        return array("status"=> "success","details"=> $report);
     }
     
 

@@ -337,7 +337,7 @@ class MiraviaService
     }
 
 
-    public function sendConfrim($order, $carrier, $tracking){
+    public function sendConfirm($order, $carrier, $tracking){
 
   
 

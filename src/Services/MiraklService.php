@@ -328,8 +328,9 @@ class MiraklService
         $this->loadCredentials($miraklMarket);
 
         $token = $this->access_token;
-        $url = $this->miraklPath.'orders/'.$order.'/tracking&shop_id='.$this->miraklIdShop;
+        $url = $this->miraklPath.'orders/'.$order.'/tracking?shop_id='.$this->miraklIdShop;
         $headers = array(
+            'Content-Type: application/json',
             'Authorization: ' . $token,
             'Accept: application/json'
         );
@@ -341,14 +342,14 @@ class MiraklService
                    
                 "carrier_name"=> $carrierInfo['strCode'],
                 "tracking_number"=> $tracking,
-                "carrier_url" =>$carrierInfo['strUrl']
+                "carrier_url" =>$carrierInfo['strUrl'].$tracking
               );
         }else{
             //toDo
         }
         
 
-        $request = $this->apiRequest('PUT', $url, $headers, $trackingInfo);
+        $request = $this->apiRequest('PUT', $url, $headers, json_encode($trackingInfo));
         if ($request['error']) {
             return array("status"=> "error","details"=> $request['error']);
           } else {
@@ -376,8 +377,9 @@ class MiraklService
         $this->loadCredentials($miraklMarket);
 
         $token = $this->access_token;
-        $url = $this->miraklPath.'orders/'.$order.'/ship&shop_id='.$this->miraklIdShop;
+        $url = $this->miraklPath.'orders/'.$order.'/ship?shop_id='.$this->miraklIdShop;
         $headers = array(
+            'Content-Type: application/json',
             'Authorization: ' . $token,
             'Accept: application/json'
         );
