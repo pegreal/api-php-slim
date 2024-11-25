@@ -66,10 +66,10 @@ class OrdersController
 
             $queryParams = $request->getQueryParams();
             $market = $queryParams['market'];
-            $country = $queryParams['country'];
+            $country = isset($queryParams['country']) ? $queryParams['country'] : null;
             $state = $queryParams['state'];
             $limit = $queryParams['limit'];
-            $offset = $queryParams['offset'];
+            $offset = isset($queryParams['offset']) ? $queryParams['offset'] : null;
 
             $ordersData = $this->ordersService->sincroOrders($market, $country, $state, $limit, $offset);
                                               

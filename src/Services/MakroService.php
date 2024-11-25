@@ -16,6 +16,13 @@ class MakroService
         'orders' => 'https://app-order-management.prod.de.metro-marketplace.cloud/openapi/v2/'
     ];
 
+    private $marketState = [
+        'confirm' => 'placed',
+        'pending' => 'confirmed',
+        'shipped' => 'shipped',
+        'cancel' => 'canceled'
+    ];
+
     //DOC: https://developer.metro-selleroffice.com/docs/
       
  
@@ -236,13 +243,14 @@ class MakroService
         $days = 30;
         $this->loadmakroPath('orders');
         $url = $this->makroPath . 'orders';
+        $orderState = $this->marketState[$state];
 
         $fechaActual = new DateTime();
         $fechaActual->modify("-$days days");
         $createdFrom = $fechaActual->format(DateTime::ATOM);
 
         if($search) $path = 'filter[created][from]='.$createdFrom;
-        else $path = urlencode('filter[created][from]').'='.urlencode($createdFrom).'&'.urlencode('filter[status][]').'='.$state;
+        else $path = urlencode('filter[created][from]').'='.urlencode($createdFrom).'&'.urlencode('filter[status][]').'='.$orderState;
         if($limit) $path .= '&limit='.$limit;
         if($offset) $path .= '&offset='.$offset;
         $url.= '?'.$path;

@@ -29,6 +29,13 @@ class MiraklService
 
     ];
 
+    private $marketState = [
+        'confirm' => 'WAITING_ACCEPTANCE',
+        'pending' => 'SHIPPING',
+        'shipped' => 'SHIPPED',
+        'cancel' => 'CANCELED'
+    ];
+
     public function __construct(DatabaseService $dbService, array $miraklConfig)
     {
         $this->dbService = $dbService;
@@ -186,6 +193,8 @@ class MiraklService
 
         $country = strtolower($country);
 
+        $orderState = $this->marketState[$state];
+
         //Leroy
         if($miraklMarket == 'leroy') {
             $miraklMarket = 'leroy_'.$country;
@@ -195,7 +204,7 @@ class MiraklService
         $this->loadCredentials($miraklMarket);
 
         $token = $this->access_token;
-        $url = $this->miraklPath.'orders?order_state_codes='.$state.'&max='.$max.'&offset='.$offset.'&shop_id='.$this->miraklIdShop;
+        $url = $this->miraklPath.'orders?order_state_codes='.$orderState.'&max='.$max.'&offset='.$offset.'&shop_id='.$this->miraklIdShop;
         $headers = array(
             'Authorization: ' . $token,
             'Accept: application/json'

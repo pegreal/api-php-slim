@@ -13,6 +13,13 @@ class MiraviaService
 
     private $path = "https://api.miravia.es/rest"; 
     //DOC: https://open.miravia.com/apps/doc/getting_started?spm=euspain.27008829.0.0.44387c73slpDIO
+
+    private $marketState = [
+        'confirm' => '',
+        'pending' => 'pending',
+        'shipped' => 'shipped',
+        'cancel' => 'canceled'
+    ];
  
 
     public function __construct(DatabaseService $dbService, array $miraviaConfig)
@@ -132,9 +139,10 @@ class MiraviaService
         $hoy = date("Y-m-d");
         $date_past = strtotime('-30 day', strtotime($hoy));
         $date_past = date('Y-m-d', $date_past);
+        $orderState = $this->marketState[$state];
 
         $parametros = array(
-            "status" => $state,  //unpaid, pending, canceled, ready_to_ship, delivered, returned, shipped and failed.
+            "status" => $orderState,  //unpaid, pending, canceled, ready_to_ship, delivered, returned, shipped and failed.
             "limt" => $max,
             "offset" => $offset,
             "created_after" => $date_past."T12:00:00+08:00"//'2017-02-10T09:00:00+08:00'//,

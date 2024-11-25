@@ -136,8 +136,8 @@ class OrdersService
                         $orders = $ordersRequest['details']['response'];
                         $ordersProcessed = $this->kuantoService->processOrders('17',$country, $orders);
                         if($ordersProcessed['status'] === 'success'){
-                            $shop = $this->shops[$country];
-                            $ordersCreated = $this->createOrders($shop,'17',$ordersProcessed['details']['response']);
+                            //$shop = $this->shops[$country];
+                            $ordersCreated = $this->createOrders('17',$ordersProcessed['details']['response']);
                             return array("status"=> "succes","details"=> $ordersCreated);
                         }
                         else{
@@ -155,9 +155,9 @@ class OrdersService
                         $orders = $ordersRequest['details']['response']->orders;
                         $ordersProcessed = $this->miraklService->processOrders('leroy','21',$country, $orders);
                         if($ordersProcessed['status'] === 'success'){
-                            $shop = $this->shops[$country];
-                            $ordersCreated = $this->createOrders($shop,'21',$ordersProcessed['details']['response']);
-                            return array("status"=> "succes","details"=> $ordersCreated);
+                            //$shop = $this->shops[$country];
+                            $ordersCreated = $this->createOrders('21',$ordersProcessed['details']['response']);
+                            return array("status"=> "success","details"=> $ordersCreated);
                         }
                         else{
                             return array("status"=> "error","details"=> $ordersProcessed['details']);
@@ -176,8 +176,8 @@ class OrdersService
                         $ordersProcessed = $this->miraviaService->processOrders('30',$country, $orders);
                         
                         if($ordersProcessed['status'] === 'success'){
-                            $shop = $this->shops[$country];
-                            $ordersCreated = $this->createOrders($shop,'30',$ordersProcessed['details']['response']);
+                            //$shop = $this->shops[$country];
+                            $ordersCreated = $this->createOrders('30',$ordersProcessed['details']['response']);
                             return array("status"=> "succes","details"=> $ordersCreated);
                         }
                         else{
@@ -198,8 +198,8 @@ class OrdersService
                         $ordersProcessed = $this->makroService->processOrders('28',$country, $orders);
                         
                         if($ordersProcessed['status'] === 'success'){
-                            $shop = $this->shops[$country];
-                            $ordersCreated = $this->createOrders($shop,'28',$ordersProcessed['details']['response']);
+                           // $shop = $this->shops[$country];
+                            $ordersCreated = $this->createOrders('28',$ordersProcessed['details']['response']);
                             return array("status"=> "success","details"=> $ordersCreated);
                         }
                         else{
@@ -220,8 +220,8 @@ class OrdersService
                         $ordersProcessed = $this->ankorService->processOrders('32',$country, $orders);
                         
                         if($ordersProcessed['status'] === 'success'){
-                            $shop = $this->shops[$country];
-                            $ordersCreated = $this->createOrders($shop,'32',$ordersProcessed['details']['response']);
+                            //$shop = $this->shops[$country];
+                            $ordersCreated = $this->createOrders('32',$ordersProcessed['details']['response']);
                             return array("status"=> "success","details"=> $ordersCreated);
                         }
                         else{
@@ -256,7 +256,7 @@ class OrdersService
 
     }
 
-    public function createOrders($idShop, $idMarket, $orders){
+    public function createOrders( $idMarket, $orders){
 
         $report = array();
         foreach($orders as $orderId => $order){
@@ -269,7 +269,9 @@ class OrdersService
             }
             else{
                 foreach($order as $lineaOrder){
-                    $createLine = $this->createOrderLine($idShop, $idMarket,$lineaOrder);
+                    $country = $lineaOrder['countryEnvio'];
+                    $shop = $this->shops[$country];
+                    $createLine = $this->createOrderLine($shop, $idMarket,$lineaOrder);
                     if($createLine['status'] == 'success'){
                         $report[] = array('Order'=> $orderId, 'Details' => 'Order Line imported');
                     }

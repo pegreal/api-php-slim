@@ -14,6 +14,12 @@ class AnkorService
 
     private $path = "https://www.ankorstore.com/api/v1/";
     //DOC: https://ankorstore.github.io/api-docs/#tag/How-to-work-with-API
+    private $marketState = [
+        'confirm' => 'ankor_confirmed',
+        'pending' => 'brand_confirmed',
+        'shipped' => 'shipped',
+        'cancel' => 'cancelled'
+    ];
  
 
     public function __construct(DatabaseService $dbService, array $ankorConfig)
@@ -156,8 +162,9 @@ class AnkorService
   
 
         $this->loadCredentials();
+        $orderState = $this->marketState[$state];
         
-        $url = $this->path.'orders?'.urlencode('filter[status]').'='.$state.'&'.urlencode('page[limit]').'='.$max;
+        $url = $this->path.'orders?'.urlencode('filter[status]').'='.$orderState.'&'.urlencode('page[limit]').'='.$max;
 
         $headers = array(
             'Accept: application/vnd.api+json',

@@ -11,14 +11,18 @@ class KuantoService
 
     private $path = "https://seller.kuantokusta.pt/api";
     //DOC: https://seller.kuantokusta.pt/api/kms/#/
- 
+
+    private $marketState = [
+        'confirm' => 'WaitingApproval',
+        'pending' => 'Approved',
+        'shipped' => 'InTransit',
+        'cancel' => 'Canceled'
+    ];
 
     public function __construct(DatabaseService $dbService, array $kuantoConfig)
     {
         $this->dbService = $dbService;
         $this->kuantoConfig = $kuantoConfig;
-
-
     }
 
 
@@ -72,7 +76,9 @@ class KuantoService
 
     public function getOrders($state, $max, $offset){
 
-        $url = $this->path."/kms/orders?maxResultsPerPage=".$max."&orderState=".$state;
+        $orderState = $this->marketState[$state];
+
+        $url = $this->path."/kms/orders?maxResultsPerPage=".$max."&orderState=".$orderState;
 
         $headers = array(
             'Accept: application/json',
