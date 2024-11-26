@@ -138,7 +138,7 @@ class OrdersService
                         if($ordersProcessed['status'] === 'success'){
                             //$shop = $this->shops[$country];
                             $ordersCreated = $this->createOrders('17',$ordersProcessed['details']['response']);
-                            return array("status"=> "succes","details"=> $ordersCreated);
+                            return array("status"=> "success","details"=> $ordersCreated);
                         }
                         else{
                             return array("status"=> "error","details"=> $ordersProcessed['details']);

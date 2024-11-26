@@ -253,11 +253,12 @@ class KuantoService
         $url = $this->path."/kms/orders/".$order."/send";
 
         $headers = array(
+            'Content-Type: application/json',
             'Accept: application/json',
             'x-api-key: '.$this->kuantoConfig['client_token']  
         );
 
-        $request = $this->apiRequest('PATCH', $url, $headers, $trackingInfo);
+        $request = $this->apiRequest('PATCH', $url, $headers, json_encode($trackingInfo));
         if ($request['error']) {
             return array("status"=> "error","details"=> $request['error']);
           } else {

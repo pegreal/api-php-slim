@@ -419,6 +419,8 @@ class MakroService
             "carrier" => $carrierId    
           );
 
+        $body = array("trackings" => $trackings);
+
         $orderItemList = $this->orderItemList($order);
 
 
@@ -429,14 +431,14 @@ class MakroService
         $url = $this->makroPath . 'order-lines/'.$idLine.'/ship';
 
         $timestamp = $this->timestamp();
-        $signature = $this->signRequest('PUT', $url, json_encode($tracking), $timestamp);
+        $signature = $this->signRequest('PUT', $url, json_encode($body), $timestamp);
 
-        $headers = $headers = $this->getHeaders($timestamp, $signature);
+        $headers = $this->getHeaders($timestamp, $signature);
 
         $request = $this->apiRequest('PUT',
                 $url,
                 $headers,
-                $tracking
+                json_encode($body)
             );
             
         if ($request['error']) {
