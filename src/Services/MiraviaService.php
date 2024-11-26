@@ -2,7 +2,8 @@
 
 namespace Services;
 
-use CURLFile;
+use DateTime;
+use DateInterval;
 
 class MiraviaService
 {
@@ -30,9 +31,104 @@ class MiraviaService
 
     }
 
+    //Guarda los credenciales en DB
+    private function updateMiraviaCredential($accesToken, $accesTokenExpiration, $refreshToken, $refreshTokenExpiration) {
+        
+        $accion="UPDATE tblAmzAccess 
+        SET access_token = '$accesToken',
+            access_token_expiration = '$accesTokenExpiration', 
+            refresh_token = '$refreshToken', 
+            refresh_token_expiration = '$refreshTokenExpiration' 
+        WHERE id = 30";
+        $consulta_= $this->dbService->ejecutarConsulta($accion);
+       
+        return '';
+    }
+
+    //Suma los segundos a la fecha actual
+    private function secondsAddCurrentDate($segundos) {
+        $fechaActual = new DateTime();
+        $fechaActual->add(new DateInterval('PT' . $segundos . 'S'));
+        $fechaMySQL = $fechaActual->format('Y-m-d H:i:s');
+        return $fechaMySQL;
+    }
+
+    public function compararFechas($fechaGuardada, $secure)
+    {
+        $fechaActual = new DateTime();
+        
+        $fechaExpiracion = new DateTime($fechaGuardada);
+        // Sumar x días a la fecha expiracion para tener margen de token
+        if($secure){
+            $fechaSeguridad = (clone $fechaExpiracion)->sub(new DateInterval('P3D'));
+        }
+        else{
+            $fechaSeguridad = $fechaExpiracion;
+        }
+        
+
+        if ($fechaActual > $fechaSeguridad) {
+            return true; //expired
+        } else {
+            return false; //valid
+        }
+    }
+
+    public function refreshToken($refresh_token){
+        
+        $requestParams = $this->getParams([]);
+        $requestParams['refresh_token'] = $refresh_token;
+
+        $sign = $this->generateSign($requestParams, '/auth/token/refresh');
+        $requestParams['sign'] = $sign;
+
+        $url = $this->path.'/auth/token/refresh';
+        $headers = array(
+            "Content-Type: application/json;charset=utf-8",
+            "Accept: application/json"
+        );
+
+        $response = $this->apiRequest("POST", $url, $headers, json_encode($requestParams));
+
+            $objetoJSON = json_decode($response['response']);
+            $access_token = $objetoJSON->access_token;
+            $this->access_token = $access_token;
+            $expires_in = $this->secondsAddCurrentDate($objetoJSON->expires_in);
+            $refresh_token = $objetoJSON->refresh_token;
+            $refresh_expires_in = $this->secondsAddCurrentDate($objetoJSON->refresh_expires_in);
+            $this->updateMiraviaCredential($access_token, $expires_in, $refresh_token, $refresh_expires_in);
+
+                       
+        return $access_token;
+
+    }
+
     private function loadCredentials() {
 
-        $this->access_token = '50000300b26hgUYAoxsxE82mtgMsB0qkZcEQen1d18d53bzwDjGvnzgVxHsAo3N';
+        //Recuperar desde DB
+        $id = 30; // ID Amazon Credentials
+        $consulta = "SELECT * FROM tblAmzAccess WHERE id = $id";
+        $resultado = $this->dbService->ejecutarConsulta($consulta);
+        if (count($resultado) > 0) {
+            $fila = $resultado[0];
+            $this->access_token = $fila['access_token'];
+            $expiration = $fila['access_token_expiration'];
+            $refresh_token = $fila['refresh_token'];
+            $refreshExpiration = $fila['refresh_token_expiration'];
+            
+            //Si expiration < que current time, actualizar credenciale
+            $itsAccessTokenExpired = $this->compararFechas($expiration, false);
+            $itsRefreshTokenExpired = $this->compararFechas($refreshExpiration, true);
+            if($itsAccessTokenExpired || $itsRefreshTokenExpired){
+                $this->access_token = $this->refreshToken($refresh_token);
+            }
+            else{
+                //El Access Token es Valido
+            }
+            
+        } else {
+            echo "No se encontraron resultados para ID = $id";
+        }
 
     }
 
@@ -143,8 +239,8 @@ class MiraviaService
 
         $parametros = array(
             "status" => $orderState,  //unpaid, pending, canceled, ready_to_ship, delivered, returned, shipped and failed.
-            "limt" => $max,
-            "offset" => $offset,
+            "limt" => $max ? $max : 50,
+            "offset" => $offset ? $offset : 0,
             "created_after" => $date_past."T12:00:00+08:00"//'2017-02-10T09:00:00+08:00'//,
         );
 
