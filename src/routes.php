@@ -23,6 +23,7 @@ return function (App $app) {
         //toDo
         $group->get('/', OrdersController::class . ':getOrders');
         $group->get('/sincro', OrdersController::class . ':sincroOrders');
+        $group->get('/carriers', OrdersController::class . ':getCarriers');
         $group->post('/file', OrdersController::class . ':ordersFile');
         $group->post('/state', OrdersController::class . ':updateOrderState');
         $group->post('/send', OrdersController::class . ':ordersSendData');

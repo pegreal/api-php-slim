@@ -57,6 +57,14 @@ class OrdersService
         $this->dbService->cerrarConexion();
         return $ordersData;
     }
+    public function getCarriers()
+    {
+        $action = "SELECT DISTINCT strLabel, strUrl FROM tblcarriers";
+
+        $carriersData = $this->dbService->ejecutarConsulta($action);
+        $this->dbService->cerrarConexion();
+        return $carriersData;
+    }
 
     public function getOrderData($orders)
     {

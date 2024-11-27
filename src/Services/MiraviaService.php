@@ -171,8 +171,8 @@ class MiraviaService
 
     private function getParams($params)
 	{
-        $params['timestamp'] = $this->timestamp();
         $params['app_key'] = $this->miraviaConfig['client_key'];
+        $params['timestamp'] = $this->timestamp();
         $params['access_token'] = $this->access_token;
         $params['sign_method'] = 'sha256';
         return $params;
@@ -451,7 +451,7 @@ class MiraviaService
         $carrierData = $this->getCarrierData($carrier, '30');
         $carrierCode = $carrierData['strCode'];
         
-        $requestParams = $this->getParams('');
+        $requestParams = $this->getParams([]);
         $requestParams['payload'] = json_encode(array("order_id"=> $order,
                                            "order_item_id_list" => $itemList,
                                            "shipping_provider_code"=> $carrierCode,
@@ -467,7 +467,7 @@ class MiraviaService
             "Accept: application/json"
         );
 
-        $request = $this->apiRequest('POST', $url, $headers, $requestParams);
+        $request = $this->apiRequest('POST', $url, $headers, json_encode($requestParams));
         if ($request['error']) {
             return array("status"=> "error","details"=> $request['error']);
           } else {
