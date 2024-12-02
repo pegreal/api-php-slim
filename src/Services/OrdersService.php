@@ -158,6 +158,8 @@ class OrdersService
                     }
                 //Leroy merlin
                 case '21' :
+                    $leroyCountry = ['ES', 'IT', 'PT'];
+                    if($country === null || !in_array($country, $leroyCountry)) break;
                     $ordersRequest = $this->miraklService->getOrders('leroy',$country, $state, $limit, $offset);
                     if($ordersRequest['status'] === 'success'){
                         $orders = $ordersRequest['details']['response']->orders;
@@ -242,12 +244,12 @@ class OrdersService
                     }      
                     
                 default :
-                    return 'No market defined';
+                return array("status"=> "error","details"=> 'No market defined');
             }
-
+            return array("status"=> "error","details"=> 'No market defined');
         }
         else{
-            return 'Fail Sincro Orders';
+            return array("status"=> "error","details"=> 'Fail OrdersSincro');
         }
 
     }

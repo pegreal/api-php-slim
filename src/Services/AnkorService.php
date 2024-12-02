@@ -342,6 +342,7 @@ class AnkorService
         
         $headers = array(
             'Accept: application/vnd.api+json',
+            'Content-Type: application/json',
             'Authorization: Bearer '.$this->access_token
         );
 
@@ -360,7 +361,7 @@ class AnkorService
             ]
         ];
 
-        $request = $this->apiRequest('POST', $url, $headers, $shipping);
+        $request = $this->apiRequest('POST', $url, $headers, json_encode($shipping));
         if ($request['error']) {
             return array("status"=> "error","details"=> $request['error']);
           } else {
@@ -398,11 +399,12 @@ class AnkorService
         
         $headers = array(
             'Accept: application/vnd.api+json',
+            'Content-Type: application/json',
             'Authorization: Bearer '.$this->access_token
         );
 
 
-        $request = $this->apiRequest('POST', $url, $headers, $shipping);
+        $request = $this->apiRequest('POST', $url, $headers, json_encode($shipping));
         if ($request['error']) {
             return array("status"=> "error","details"=> $request['error']);
           } else {
@@ -417,7 +419,7 @@ class AnkorService
         $quotaRequest = $this->getSendQuota($order);
 
         $quoteId = false;
-        if ($quotaRequest['error']) {
+        if (isset($quotaRequest['error'])) {
             return array("status"=> "error","details"=> $quotaRequest['error']);
         }
         else {
@@ -426,7 +428,7 @@ class AnkorService
 
             if($quoteId){
                 $confirmRequest = $this->confirmQuota($quoteId, $carrier, $tracking);
-                if ($confirmRequest['error']) {
+                if (isset($confirmRequest['error'])) {
                     return array("status"=> "error","details"=> $confirmRequest['error']);
                   } else {
                     return array("status"=> "success","details"=> $confirmRequest['details']);

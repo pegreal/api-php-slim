@@ -60,7 +60,7 @@ class MiraviaService
         $fechaExpiracion = new DateTime($fechaGuardada);
         // Sumar x días a la fecha expiracion para tener margen de token
         if($secure){
-            $fechaSeguridad = (clone $fechaExpiracion)->sub(new DateInterval('P3D'));
+            $fechaSeguridad = (clone $fechaExpiracion)->sub(new DateInterval('P2D'));
         }
         else{
             $fechaSeguridad = $fechaExpiracion;
