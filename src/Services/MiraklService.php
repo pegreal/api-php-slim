@@ -141,33 +141,7 @@ class MiraklService
         );
 
         $request = $this->apiRequest('POST', $url, $headers, $postfields);
-        /*
-        $curl = curl_init();
 
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-		CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => $postfields,
-        CURLOPT_HTTPHEADER => array(
-          'Authorization: ' . $token,
-          'Accept: application/json',
-          'Content-Type: multipart/form-data'
-        ),
-      ));
-
-	$response = curl_exec($curl);
-        $err = curl_error($curl);
-	$httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-        curl_close($curl);
-      */
         if ($request['error']) {
           return array("status"=> "error","details"=> $request['error']);
         } else {
