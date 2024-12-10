@@ -2,6 +2,7 @@
 
 namespace Services;
 use Exception;
+use DateTime;
 
 class OrdersService
 {
@@ -332,9 +333,12 @@ class OrdersService
         
         $CIF = $orderData['CIF'];
         $isPro = $orderData['isPro'];
-        $sector = $orderData['sector'];
+        $sector = $orderData['sector'] ? $orderData['sector'] : 0;
         
-        $FechaSucces = $orderData['success'];
+        $isoDate = $orderData['success'];
+        $dateTime = new DateTime($isoDate);
+        $FechaSucces = $dateTime->format('Y-m-d H:i:s');
+
         $idMarketLine = $orderData['idLine'];
         $NameProduct = $orderData['title'];
         $ID_Product = $orderData['sku'];
@@ -378,7 +382,7 @@ class OrdersService
                     '$NameProduct',
                     '$Product_Qty', 
                     '$countryCode',
-                    STR_TO_DATE('$FechaSucces', '%Y-%m-%dT%H:%i:%s'),
+                    '$FechaSucces',
                     '$idMarketLine',
                     '$agent', '$agent', '2', '$tipoCliente', '$company', '$sector' )";
     
