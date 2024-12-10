@@ -276,7 +276,7 @@ class MiraklService
 
         }
         else{
-            return array("status"=> "success","details"=> "No orders found");
+            return array("status"=> "error","details"=> "No orders found");
         }
 
     }

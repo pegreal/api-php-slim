@@ -367,7 +367,13 @@ class AmazonService
         $ordersData = $this->getOrders($query);
         $ordersData = json_decode($ordersData);
         $orders = $ordersData->payload->Orders;
-        $nextToken = $ordersData->payload->NextToken;
+        if(isset($ordersData->payload->NextToken)){
+            $nextToken = $ordersData->payload->NextToken;
+        }
+        else{
+            $nextToken = false;
+        }
+        
 
         $businessOrders = array();
 

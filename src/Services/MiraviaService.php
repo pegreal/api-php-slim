@@ -392,7 +392,7 @@ class MiraviaService
                     $orderData['title'] = $orderLine->name;
                     $orderData['sku'] = $orderLine->sku;
                     $orderData['ean'] = $orderLine->sku;
-                    $orderData['totalLine'] = $orderLine->paid_price;
+                    $orderData['totalLine'] = $orderLine->item_price;
                     $orderData['quantity'] = 1; //Cada unidad viene en una línea. Pendiente de validar
                 
                 //insertar en la DB cada linea
