@@ -378,7 +378,7 @@ class OrdersService
                     '$NameProduct',
                     '$Product_Qty', 
                     '$countryCode',
-                    '$FechaSucces',
+                    STR_TO_DATE('$FechaSucces', '%Y-%m-%dT%H:%i:%s'),
                     '$idMarketLine',
                     '$agent', '$agent', '2', '$tipoCliente', '$company', '$sector' )";
     
