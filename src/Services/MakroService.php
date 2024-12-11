@@ -243,13 +243,13 @@ class MakroService
         $days = 30;
         $this->loadmakroPath('orders');
         $url = $this->makroPath . 'orders';
-        $orderState = $this->marketState[$state];
+        $orderState = $state ? $this->marketState[$state]: null;
 
         $fechaActual = new DateTime();
         $fechaActual->modify("-$days days");
         $createdFrom = $fechaActual->format(DateTime::ATOM);
 
-        if($search) $path = 'filter[created][from]='.$createdFrom;
+        if($search) $path = 'filter[created][from]='.urlencode($createdFrom);
         else $path = urlencode('filter[created][from]').'='.urlencode($createdFrom).'&'.urlencode('filter[status][]').'='.$orderState;
         if($limit) $path .= '&limit='.$limit;
         if($offset) $path .= '&offset='.$offset;
