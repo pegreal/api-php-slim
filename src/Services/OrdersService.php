@@ -127,7 +127,7 @@ class OrdersService
         }
         
         $this->dbService->ejecutarConsulta($action);
-        $this->dbService->cerrarConexion();
+        //$this->dbService->cerrarConexion();
 
         return array("status"=> "success","details"=> $orders);
         
