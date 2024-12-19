@@ -89,6 +89,13 @@ class InvoicesService
                             $this->updateInvoiceState($idOrderMarket, $market, 2);
                         }
                         return $sendInvoice;
+                    //Worten
+                    case '13' :
+                        $sendInvoice = $this->miraklService->sendInvoice('worten',$idOrderMarket, $country, $invoice);
+                        if($sendInvoice['status'] == 'success'){
+                            $this->updateInvoiceState($idOrderMarket, $market, 2);
+                        }
+                        return $sendInvoice;
                     
                 default :
                     return 'No market defined';

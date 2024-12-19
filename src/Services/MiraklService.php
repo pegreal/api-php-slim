@@ -15,7 +15,8 @@ class MiraklService
 
     private $paths = [
         'leroy' => 'https://leroymerlin-marketplace.mirakl.net/api/',
-        'carrefour' => 'https://carrefoures-prod.mirakl.net/api/'
+        'carrefour' => 'https://carrefoures-prod.mirakl.net/api/',
+        'worten' => 'https://marketplace.worten.pt/api/'
     ];
 
     
