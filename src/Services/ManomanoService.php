@@ -48,12 +48,12 @@ class ManomanoService
        
         $country = strtolower($country);
 
-        $fileName = 'invoice-'.$idOrderMarket.'.pdf';
+        $fileName = 'factura-'.$idOrderMarket.'.pdf';
 
         $mail = $this->getOrderMail($idOrderMarket);
 
         $body = '<p>Buenos días</p><p>Adjuntamos la factura de su pedido en Manomano '.$idOrderMarket.' : </p><p>Saludos</p>';
-        $subject = 'Factura '.$idOrderMarket;
+        $subject = 'Tu factura '.$idOrderMarket;
 
         //Enviar por correo
         $result = $this->mailService->sendEmail($mail, $subject, $body, $fileName, $invoice);
