@@ -187,7 +187,7 @@ class AnkorService
     public function getOrderItems($orderId){
         
         $this->loadCredentials();
-        $url = $this->path.'orders/'.$orderId.'?include=retailer,orderItems.productOption';
+        $url = $this->path.'orders/'.$orderId.'?include=retailer,orderItems.productVariant';
         
         $headers = array(
             'Accept: application/vnd.api+json',
@@ -270,7 +270,7 @@ class AnkorService
                 {   
                     $orderData['idLine'] = $orderUuid;
                     $linePriceQuantity = $this->getAttributesById($linesData, $orderLine->id);
-                    $lineProductInfo = $this->getAttributesById($linesData, $linePriceQuantity->relationships->productOption->data->id);
+                    $lineProductInfo = $this->getAttributesById($linesData, $linePriceQuantity->relationships->productVariant->data->id);
                     
                     $orderData['title'] = $lineProductInfo->attributes->name;
                     $orderData['sku'] = $lineProductInfo->attributes->sku;

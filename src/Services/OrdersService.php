@@ -359,6 +359,8 @@ class OrdersService
         $LastNameEnvio = str_replace($CaracterEspecial, "", $LastNameEnvio);
         $firtsNameFact = str_replace($CaracterEspecial, "", $firtsNameFact);
         $LastNameFact = str_replace($CaracterEspecial, "", $LastNameFact);
+
+        $company = str_replace($CaracterEspecial, "", $company);
     
         $actionRequest = "INSERT INTO tblPedidosAPI
             (intMarket,
@@ -437,6 +439,7 @@ class OrdersService
             $tracking = $orderData['strTracking'];
             $update = isset($orderData['update']) ? $orderData['update'] : false;
 
+            //Condicionar si no hay seguimiento o transportista no seguir y añadir error al reporte.
             try{
             
             switch($market){
