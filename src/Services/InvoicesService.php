@@ -33,8 +33,9 @@ class InvoicesService
     }
 
     public function updateInvoiceState($idOrderMarket, $market, $state) {
-        
-        $actionRequest = "UPDATE tblfacturasapp SET intEstado='$state' WHERE tblfacturasapp.strIdmarket = '$idOrderMarket'";
+
+        $timestamp = date("Y-m-d H:i:s");
+        $actionRequest = "UPDATE tblfacturasapp SET intEstado='$state', timestamp= '$timestamp' WHERE tblfacturasapp.strIdmarket = '$idOrderMarket'";
 
         $this->dbService->ejecutarConsulta($actionRequest);
 
