@@ -440,32 +440,14 @@ class OrdersService
             $update = isset($orderData['update']) ? $orderData['update'] : false;
 
             //Condicionar si no hay seguimiento o transportista no seguir y añadir error al reporte.
-            try{
-            
-            switch($market){
-                //Kuanto
-                case '17' :
-                    $sendRequest = $this->kuantoService->sendConfirm($order, $carrier, $tracking);
-                    if($sendRequest['status'] === 'success'){
-                        $updateState = $this->updateOrderState($order, null, 3);
-                        $report[] = array( "order" => $order, "status"=> "success","detail"=> $sendRequest['details']);
-                    }
-                    else{
-                        $report[] = array( "order" => $order, "status"=> "error","detail"=> $sendRequest['details']);
-                    }
-                    break;
-                //Leroy merlin
-                case '21' :
-                    $trackingRequest = $this->miraklService->sendTracking("leroy", $market, $country, $order, $carrier, $tracking);
-                    if($trackingRequest['status'] === 'success'){
-                        $report[] = array( "order" => $order, "status"=> "success","detail"=> $trackingRequest['details']);
-                    }
-                    else{
-                        $report[] = array( "order" => $order, "status"=> "error","detail"=> $trackingRequest['details']);
-                    }
-                    if(!$update)
-                    {
-                        $sendRequest = $this->miraklService->sendConfirm("leroy", $country, $order);
+            if($carrier && $tracking)
+            {
+                try{
+                
+                switch($market){
+                    //Kuanto
+                    case '17' :
+                        $sendRequest = $this->kuantoService->sendConfirm($order, $carrier, $tracking);
                         if($sendRequest['status'] === 'success'){
                             $updateState = $this->updateOrderState($order, null, 3);
                             $report[] = array( "order" => $order, "status"=> "success","detail"=> $sendRequest['details']);
@@ -473,50 +455,75 @@ class OrdersService
                         else{
                             $report[] = array( "order" => $order, "status"=> "error","detail"=> $sendRequest['details']);
                         }
-                    }
-                    break;
+                        break;
+                    //Leroy merlin
+                    case '21' :
+                        $trackingRequest = $this->miraklService->sendTracking("leroy", $market, $country, $order, $carrier, $tracking);
+                        if($trackingRequest['status'] === 'success'){
+                            $report[] = array( "order" => $order, "status"=> "success","detail"=> $trackingRequest['details']);
+                        }
+                        else{
+                            $report[] = array( "order" => $order, "status"=> "error","detail"=> $trackingRequest['details']);
+                        }
+                        if(!$update)
+                        {
+                            $sendRequest = $this->miraklService->sendConfirm("leroy", $country, $order);
+                            if($sendRequest['status'] === 'success'){
+                                $updateState = $this->updateOrderState($order, null, 3);
+                                $report[] = array( "order" => $order, "status"=> "success","detail"=> $sendRequest['details']);
+                            }
+                            else{
+                                $report[] = array( "order" => $order, "status"=> "error","detail"=> $sendRequest['details']);
+                            }
+                        }
+                        break;
+                        
+                    //Makro
+                    case '28':
+                        $sendRequest = $this->makroService->sendConfirm($order, $carrier, $tracking);
+                        if($sendRequest['status'] === 'success'){
+                            $updateState = $this->updateOrderState($order, null, 3);
+                            $report[] = array( "order" => $order, "status"=> "success","detail"=> $sendRequest['details']);
+                        }
+                        else{
+                            $report[] = array( "order" => $order, "status"=> "error","detail"=> $sendRequest['details']);
+                        }
+                        break;
+                    //Miravia 
+                    case '30':
+                        $sendRequest = $this->miraviaService->sendConfirm($order, $carrier, $tracking);
+                        if($sendRequest['status'] === 'success'){
+                            $updateState = $this->updateOrderState($order, null, 3);
+                            $report[] = array( "order" => $order, "status"=> "success","detail"=> $sendRequest['details']);
+                        }
+                        else{
+                            $report[] = array( "order" => $order, "status"=> "error","detail"=> $sendRequest['details']);
+                        }
+                        break;
+                    //AnkorStore
+                    case '32':
+                        $sendRequest = $this->ankorService->sendConfirm($order, $carrier, $tracking);
+                        if($sendRequest['status'] === 'success'){
+                            $updateState = $this->updateOrderState($order, null, 3);
+                            $report[] = array( "order" => $order, "status"=> "success","detail"=> $sendRequest['details']);
+                        }
+                        else{
+                            $report[] = array( "order" => $order, "status"=> "error","detail"=> $sendRequest['details']);
+                        }
+                        break;
                     
-                //Makro
-                case '28':
-                    $sendRequest = $this->makroService->sendConfirm($order, $carrier, $tracking);
-                    if($sendRequest['status'] === 'success'){
-                        $updateState = $this->updateOrderState($order, null, 3);
-                        $report[] = array( "order" => $order, "status"=> "success","detail"=> $sendRequest['details']);
-                    }
-                    else{
-                        $report[] = array( "order" => $order, "status"=> "error","detail"=> $sendRequest['details']);
-                    }
-                    break;
-                //Miravia 
-                case '30':
-                    $sendRequest = $this->miraviaService->sendConfirm($order, $carrier, $tracking);
-                    if($sendRequest['status'] === 'success'){
-                        $updateState = $this->updateOrderState($order, null, 3);
-                        $report[] = array( "order" => $order, "status"=> "success","detail"=> $sendRequest['details']);
-                    }
-                    else{
-                        $report[] = array( "order" => $order, "status"=> "error","detail"=> $sendRequest['details']);
-                    }
-                    break;
-                //AnkorStore
-                case '32':
-                    $sendRequest = $this->ankorService->sendConfirm($order, $carrier, $tracking);
-                    if($sendRequest['status'] === 'success'){
-                        $updateState = $this->updateOrderState($order, null, 3);
-                        $report[] = array( "order" => $order, "status"=> "success","detail"=> $sendRequest['details']);
-                    }
-                    else{
-                        $report[] = array( "order" => $order, "status"=> "error","detail"=> $sendRequest['details']);
-                    }
-                    break;
-                
 
+                }
+            }catch(Exception $e){
+                $error = $e->getMessage();
+                $report[] = array("order" => $order, "status" => "error", "detail" => $error);
+            
             }
-        }catch(Exception $e){
-            $error = $e->getMessage();
-            $report[] = array("order" => $order, "status" => "error", "detail" => $error);
-           
         }
+        else{
+            $report[] = array("order" => $order, "status" => "error", "detail" => "El transportista o seguiento esta en blanco       ");
+        }
+
         }
         return array("status"=> "success","details"=> $report);
     }
