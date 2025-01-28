@@ -118,7 +118,7 @@ class MiraviaService
             
             //Si expiration < que current time, actualizar credenciale
             $itsAccessTokenExpired = $this->compararFechas($expiration, false);
-            $itsRefreshTokenExpired = $this->compararFechas($refreshExpiration, true);
+            $itsRefreshTokenExpired = $this->compararFechas($refreshExpiration, false); //try token refresh
             if($itsAccessTokenExpired || $itsRefreshTokenExpired){
                 $this->access_token = $this->refreshToken($refresh_token);
             }
