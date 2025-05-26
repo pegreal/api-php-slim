@@ -28,6 +28,8 @@ return function (App $app) {
         $group->post('/state', OrdersController::class . ':updateOrderState');
         $group->post('/send', OrdersController::class . ':ordersSendData');
         $group->post('/confirm', OrdersController::class . ':ordersSend');
+        $group->post('/buttons', OrdersController::class . ':ordersButton');
+
     });
 
     $app->group('/invoices', function ($group) {

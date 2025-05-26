@@ -527,6 +527,13 @@ class OrdersService
         }
         return array("status"=> "success","details"=> $report);
     }
+
+    public function ordersButton ($ordersData, $dateButton) {
+
+        $updateState = $this->updateOrderState($ordersData, null, 3);
+        return array("status"=> "success","details"=> $updateState);
+
+    }
     
 
     
