@@ -8,7 +8,7 @@ class KauflandService
     private $kauflandConfig;
 
     private $kauflandPath = 'https://sellerapi.kaufland.com/v2/';
-
+    //DOC: https://sellerapi.kaufland.com/
   
       
  

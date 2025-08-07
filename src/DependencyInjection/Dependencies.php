@@ -3,6 +3,7 @@
 use DI\Container;
 use Services\DatabaseService;
 use Services\MailService;
+use Services\ExcelService;
 
 use Controllers\AuthController;
 use Controllers\OrdersController;
@@ -17,6 +18,9 @@ use Services\MiraklService;
 use Services\MakroService;
 use Services\KauflandService;
 use Services\ManomanoService;
+use Services\MiraviaService;
+use Services\KuantoService;
+use Services\AnkorService;
 
 
 return function (Container $container) {
@@ -51,10 +55,7 @@ return function (Container $container) {
         return new OrdersController($container->get(OrdersService::class));
     });
 
-    // Configurar ordersService
-    $container->set(OrdersService::class, function ($container) {
-        return new OrdersService($container->get(DatabaseService::class));
-    });
+   
 
      // Configurar InvoicesController
      $container->set(InvoicesController::class, function ($container) {
@@ -115,7 +116,7 @@ return function (Container $container) {
         return $kauflandConfig;
     }); 
 
-    // Configurar MakroService
+    // Configurar KauflandService
     $container->set(KauflandService::class, function ($container) {
         
         return new KauflandService(
@@ -148,6 +149,54 @@ return function (Container $container) {
         );
     });
 
+    // Configurar el array de configuración adicional
+    $container->set('miraviaConfig', function () {
+        require __DIR__ . '/../../config.php';
+        $miraviaConfig = $config['miraviaConfig']; 
+        return $miraviaConfig;
+    }); 
+
+     // Configurar MiraviaService
+     $container->set(MiraviaService::class, function ($container) {
+        
+        return new MiraviaService(
+            $container->get(DatabaseService::class),
+            $container->get('miraviaConfig')
+        );
+    });
+
+     // Kuantokusta Configurar el array de configuración adicional
+     $container->set('kuantoConfig', function () {
+        require __DIR__ . '/../../config.php';
+        $kuantoConfig = $config['kuantoConfig']; 
+        return $kuantoConfig;
+    }); 
+
+    // Configurar KauflandService
+    $container->set(KuantoService::class, function ($container) {
+        
+        return new KuantoService(
+            $container->get(DatabaseService::class),
+            $container->get('kuantoConfig')
+        );
+    });
+
+    // Ankorstore Configurar el array de configuración adicional
+    $container->set('ankorConfig', function () {
+        require __DIR__ . '/../../config.php';
+        $ankorConfig = $config['ankorConfig']; 
+        return $ankorConfig;
+    }); 
+
+    // Configurar Ankorstore Service
+    $container->set(AnkorService::class, function ($container) {
+        
+        return new AnkorService(
+            $container->get(DatabaseService::class),
+            $container->get('ankorConfig')
+        );
+    });
+
 
 
     // Configurar InvoicesService
@@ -159,6 +208,19 @@ return function (Container $container) {
             $container->get(MakroService::class),
             $container->get(KauflandService::class),
             $container->get(ManomanoService::class),
+        );
+    });
+
+     // Configurar ordersService
+     $container->set(OrdersService::class, function ($container) {
+        return new OrdersService(
+            $container->get(DatabaseService::class),
+            $container->get(MiraklService::class),
+            $container->get(MakroService::class),
+            $container->get(MiraviaService::class),
+            $container->get(KuantoService::class),
+            $container->get(AnkorService::class),
+            $container->get(ExcelService::class),
         );
     });
 

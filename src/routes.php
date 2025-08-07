@@ -22,6 +22,14 @@ return function (App $app) {
     $app->group('/orders', function ($group) {
         //toDo
         $group->get('/', OrdersController::class . ':getOrders');
+        $group->get('/sincro', OrdersController::class . ':sincroOrders');
+        $group->get('/carriers', OrdersController::class . ':getCarriers');
+        $group->post('/file', OrdersController::class . ':ordersFile');
+        $group->post('/state', OrdersController::class . ':updateOrderState');
+        $group->post('/send', OrdersController::class . ':ordersSendData');
+        $group->post('/confirm', OrdersController::class . ':ordersSend');
+        $group->post('/buttons', OrdersController::class . ':ordersButton');
+
     });
 
     $app->group('/invoices', function ($group) {

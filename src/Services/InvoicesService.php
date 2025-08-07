@@ -23,7 +23,7 @@ class InvoicesService
 
     }
 
-    public function getInvoices($market, $limit = 300)
+    public function getInvoices($market, $limit = 500)
     {
         //$test = $this->amazonService->createInvoiceDocument();
         $action = "SELECT * FROM tblfacturasapp  WHERE idMarket = $market ORDER BY strIdPresta DESC LIMIT $limit ";
@@ -33,8 +33,9 @@ class InvoicesService
     }
 
     public function updateInvoiceState($idOrderMarket, $market, $state) {
-        
-        $actionRequest = "UPDATE tblfacturasapp SET intEstado='$state' WHERE tblfacturasapp.strIdmarket = '$idOrderMarket'";
+
+        $timestamp = date("Y-m-d H:i:s");
+        $actionRequest = "UPDATE tblfacturasapp SET intEstado='$state', timestamp= '$timestamp' WHERE tblfacturasapp.strIdmarket = '$idOrderMarket'";
 
         $this->dbService->ejecutarConsulta($actionRequest);
 
@@ -85,6 +86,13 @@ class InvoicesService
                     //Manomano
                     case '3' :
                         $sendInvoice = $this->manomanoService->sendInvoice($idOrderMarket, $country, $invoice);
+                        if($sendInvoice['status'] == 'success'){
+                            $this->updateInvoiceState($idOrderMarket, $market, 2);
+                        }
+                        return $sendInvoice;
+                    //Worten
+                    case '13' :
+                        $sendInvoice = $this->miraklService->sendInvoice('worten',$idOrderMarket, $country, $invoice);
                         if($sendInvoice['status'] == 'success'){
                             $this->updateInvoiceState($idOrderMarket, $market, 2);
                         }
