@@ -32,7 +32,8 @@ $config = [
         'leroy_es' => ['token'=>$_ENV['LEROY_ES_TOKEN'], 'idShop' => $_ENV['LEROY_ES_SHOP']],
         'leroy_it' => ['token'=>$_ENV['LEROY_IT_TOKEN'], 'idShop' => $_ENV['LEROY_IT_SHOP']],
         'leroy_pt' => ['token'=>$_ENV['LEROY_PT_TOKEN'], 'idShop' => $_ENV['LEROY_PT_SHOP']],
-        'carrefour' => ['token'=>$_ENV['CARREFOUR_TOKEN'], 'idShop' => $_ENV['CARREFOUR_SHOP']]
+        'carrefour' => ['token'=>$_ENV['CARREFOUR_TOKEN'], 'idShop' => $_ENV['CARREFOUR_SHOP']],
+        'worten' => ['token'=>$_ENV['WORTEN_TOKEN'], 'idShop' => $_ENV['WORTEN_SHOP']],
 
     ],
     'makroConfig' => [
@@ -42,6 +43,17 @@ $config = [
     'kauflandConfig' => [
         'client_key' => $_ENV['KAUFLAND_KEY'],
         'client_secret' => $_ENV['KAUFLAND_SECRET']
+    ],
+    'miraviaConfig' => [
+        'client_key' => $_ENV['MIRAVIA_KEY'],
+        'client_secret' => $_ENV['MIRAVIA_SECRET']
+    ],
+    'kuantoConfig' => [
+        'client_token' => $_ENV['KUANTO_TOKEN']
+    ],
+    'ankorConfig' => [
+        'client_key' => $_ENV['ANKOR_KEY'],
+        'client_secret' => $_ENV['ANKOR_SECRET']
     ],
     'mailConfig' => [
         'host' => $_ENV['MAIL_HOST'],
