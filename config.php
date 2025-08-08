@@ -19,7 +19,7 @@ $config = [
         "attribute" => "decoded_token_data",
         "algorithm" => ["HS256"],
         "path" => [ $path."/orders/", $path."/templates/", $path."/invoices/"], // Rutas que requerirán autenticación
-        "ignore" => ["/auth/signin"], // Rutas que no requerirán autenticación
+        "ignore" => ["/auth/signin", "/public/templates"], // Rutas que no requerirán autenticación
     ],
     'amzConfig' =>[
         'refresh_token'=> $_ENV['AMZ_LWA_TOKEN'],

@@ -21,6 +21,11 @@ class DatabaseService
         }
     }
 
+    public function escape($valor)
+    {
+        return $this->db->real_escape_string($valor);
+    }
+
      public function ejecutarConsulta($sql)
     {
         $result = $this->db->query($sql);

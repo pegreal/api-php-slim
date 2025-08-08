@@ -8,9 +8,11 @@ use Services\ExcelService;
 use Controllers\AuthController;
 use Controllers\OrdersController;
 use Controllers\InvoicesController;
+use Controllers\TemplatesController;
 
 use Services\OrdersService;
 use Services\InvoicesService;
+use Services\TemplatesService;
 
 
 use Services\AmazonService;
@@ -60,6 +62,11 @@ return function (Container $container) {
      // Configurar InvoicesController
      $container->set(InvoicesController::class, function ($container) {
         return new InvoicesController($container->get(InvoicesService::class));
+    });
+
+    // Configurar TemplatesController
+     $container->set(TemplatesController::class, function ($container) {
+        return new TemplatesController($container->get(TemplatesService::class));
     });
 
     // Configurar el array de configuración adicional
@@ -221,6 +228,14 @@ return function (Container $container) {
             $container->get(KuantoService::class),
             $container->get(AnkorService::class),
             $container->get(ExcelService::class),
+        );
+    });
+
+    // Configurar TemplatesService
+    $container->set(TemplatesService::class, function ($container) {
+        return new TemplatesService(
+            $container->get(DatabaseService::class),
+           
         );
     });
 
