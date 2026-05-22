@@ -6,6 +6,7 @@ use Slim\App;
 use Controllers\AuthController;
 use Controllers\OrdersController;
 use Controllers\InvoicesController;
+use Controllers\TemplatesController;
 
 return function (App $app) {
     
@@ -38,6 +39,16 @@ return function (App $app) {
         $group->get('/business', InvoicesController::class . ':businessOrders');
         $group->post('/state', InvoicesController::class . ':updateInvoiceState');
         $group->post('/send', InvoicesController::class . ':sendInvoice');
+    });
+
+     $app->group('/templates', function ($group) {
+        $group->get('/', TemplatesController::class . ':getTemplates');
+        $group->post('/', TemplatesController::class . ':createTemplate');
+        $group->put('/update', TemplatesController::class . ':updateTemplate');
+    });
+
+    $app->group('/public', function ($group) {
+        $group->get('/templates', TemplatesController::class . ':getPublicTemplates');
     });
 
 };
