@@ -348,12 +348,14 @@ class OrdersService
         
         // Control Carácteres especiales
         //Anyadir en este array todo caracter conflictivo
-        $CaracterEspecial = array("'");
+        $CaracterEspecial = array("'","’");
         $NameProduct = str_replace($CaracterEspecial, "", $NameProduct);
         $cityEnvio = str_replace($CaracterEspecial, "", $cityEnvio);
         $streetEnvio = str_replace($CaracterEspecial, "", $streetEnvio);
+        $provinciaEnvio = str_replace($CaracterEspecial, "", $provinciaEnvio);
         $cityFact = str_replace($CaracterEspecial, "", $cityFact);
         $streetFact = str_replace($CaracterEspecial, "", $streetFact);
+        $provinciaFact = str_replace($CaracterEspecial, "", $provinciaFact);
         
         $firtsNameEnvio = str_replace($CaracterEspecial, "", $firtsNameEnvio);
         $LastNameEnvio = str_replace($CaracterEspecial, "", $LastNameEnvio);

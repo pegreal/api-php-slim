@@ -23,7 +23,7 @@ class InvoicesService
 
     }
 
-    public function getInvoices($market, $limit = 500)
+    public function getInvoices($market, $limit = 1000)
     {
         //$test = $this->amazonService->createInvoiceDocument();
         $action = "SELECT * FROM tblfacturasapp  WHERE idMarket = $market ORDER BY strIdPresta DESC LIMIT $limit ";
