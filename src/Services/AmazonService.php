@@ -27,6 +27,7 @@ class AmazonService
     );
 
 
+
     public function __construct(DatabaseService $dbService, array $amzConfig)
     {
         $this->dbService = $dbService;
@@ -351,24 +352,27 @@ class AmazonService
 
     //Descarga de pedidos
     public function getOrders($query) {
-
+        //https://developer-docs.amazon.com/sp-api/reference/searchorders
         $this->loadCredentials();
-        return $this->apiRequestV2('GET', '/orders/v0/orders', $query, "");
+        return $this->apiRequestV2('GET', '/orders/2026-01-01/orders', $query, "");
         
     }
 
     public function businessOrders($from) {
-        
+        //https://developer-docs.amazon.com/sp-api/reference/searchorders
         $query = array(
-            'CreatedAfter' => $from."T00:00:30Z",
-            'OrderStatuses' => 'Shipped', 
-            "MarketplaceIds" => 'A1RKKUPIHCS9HS,A13V1IB3VIYZZH,A1PA6795UKMFR9,APJ6JRA9NG5V4,A1F83G8C2ARO7P,A1805IZSGTT6HS,AMEN7PMS3EDWL');
+            'createdAfter' => $from."T00:00:30Z",
+            'fulfillmentStatuses' => 'SHIPPED',
+            "marketplaceIds" => 'A1RKKUPIHCS9HS,A13V1IB3VIYZZH,A1PA6795UKMFR9,APJ6JRA9NG5V4,A1F83G8C2ARO7P,A1805IZSGTT6HS,AMEN7PMS3EDWL,A1C3SOZRARQ6R3',
+            //'includedData' => 'BUYER'
+            
+        );
 
         $ordersData = $this->getOrders($query);
         $ordersData = json_decode($ordersData);
-        $orders = $ordersData->payload->Orders;
-        if(isset($ordersData->payload->NextToken)){
-            $nextToken = $ordersData->payload->NextToken;
+        $orders = $ordersData->orders;
+        if(isset($ordersData->pagination->nextToken)){
+            $nextToken = $ordersData->pagination->nextToken;
         }
         else{
             $nextToken = false;
@@ -379,29 +383,34 @@ class AmazonService
 
         $ordersFiltered= $this->filterBusinessOrders($orders);
         foreach($ordersFiltered as $order){
-            $businessOrders[] = $order->AmazonOrderId;
+            $businessOrders[] = $order->orderId;
         }
 
         if($nextToken){
             while($nextToken)
             {
                 $query = array(
-                'NextToken' => $nextToken,
+                    'createdAfter' => $from."T00:00:30Z",
+                    'fulfillmentStatuses' => 'SHIPPED',
+                    "marketplaceIds" => 'A1RKKUPIHCS9HS,A13V1IB3VIYZZH,A1PA6795UKMFR9,APJ6JRA9NG5V4,A1F83G8C2ARO7P,A1805IZSGTT6HS,AMEN7PMS3EDWL,A1C3SOZRARQ6R3',
+                    //'includedData' => 'BUYER',
+                    'paginationToken' => $nextToken
+                    
                 );
 
                 $ordersData = $this->getOrders($query);
                 $ordersData = json_decode($ordersData);
                 $nextToken = null;
-                $orders = $ordersData->payload->Orders;
+                $orders = $ordersData->orders;
 
-                if(isset($ordersData->payload->NextToken)){
-                    $nextToken = $ordersData->payload->NextToken;
+                if(isset($ordersData->pagination->nextToken)){
+                    $nextToken = $ordersData->pagination->nextToken;
                 }
 
                 $ordersFiltered= $this->filterBusinessOrders($orders);
 
                 foreach($ordersFiltered as $order){
-                    $businessOrders[] = $order->AmazonOrderId;
+                    $businessOrders[] = $order->orderId;
                 }
             }
         }
@@ -414,7 +423,12 @@ class AmazonService
     public function filterBusinessOrders($orders){
 
         $filteredData = array_filter($orders, function($item) {
-            return $item->IsBusinessOrder === true;
+            if(isset($item->programs))
+                {
+                    return in_array("AMAZON_BUSINESS", $item->programs);
+                    
+                }
+            
         });
 
         return $filteredData;
